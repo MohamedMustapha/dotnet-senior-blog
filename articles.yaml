@@ -319,7 +319,7 @@ series:
         title_fr: "Tests End-to-End avec Playwright"
         slug: "e2e-playwright"
         tags: ["testing", "e2e", "playwright", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Architecture Testing in .NET"
         title_fr: "Tests d'Architecture en .NET"
