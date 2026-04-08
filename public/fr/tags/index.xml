@@ -6,28 +6,6 @@
     <description>Recent content in Tags on .NET Senior Path</description>
     <generator>Hugo</generator>
     <language>fr</language>
-    <lastBuildDate>Wed, 08 Apr 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/fr/tags/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Architecture</title>
-      <link>http://localhost:1313/fr/tags/architecture/</link>
-      <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/fr/tags/architecture/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Cqrs</title>
-      <link>http://localhost:1313/fr/tags/cqrs/</link>
-      <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/fr/tags/cqrs/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Dotnet</title>
-      <link>http://localhost:1313/fr/tags/dotnet/</link>
-      <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/fr/tags/dotnet/</guid>
-      <description></description>
-    </item>
   </channel>
 </rss>

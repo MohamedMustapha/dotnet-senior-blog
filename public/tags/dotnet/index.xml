@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Dotnet on .NET Senior Path</title>
+    <title>Dotnet on Congo</title>
     <link>http://localhost:1313/tags/dotnet/</link>
-    <description>Recent content in Dotnet on .NET Senior Path</description>
+    <description>Recent content in Dotnet on Congo</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Wed, 08 Apr 2026 00:00:00 +0000</lastBuildDate>
@@ -13,14 +13,7 @@
       <link>http://localhost:1313/en/posts/cqrs-explained/</link>
       <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/en/posts/cqrs-explained/</guid>
-      <description>&lt;p&gt;+++&#xA;date = &amp;lsquo;2026-04-08T07:55:01+02:00&amp;rsquo;&#xA;draft = true&#xA;title = &amp;lsquo;Cqrs Explained&amp;rsquo;&#xA;+++&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>CQRS Explained for .NET Developers</title>
-      <link>http://localhost:1313/fr/posts/cqrs-explique/</link>
-      <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/fr/posts/cqrs-explique/</guid>
-      <description>&lt;p&gt;+++&#xA;date = &amp;lsquo;2026-04-08T07:55:13+02:00&amp;rsquo;&#xA;draft = true&#xA;title = &amp;lsquo;Cqrs Explique&amp;rsquo;&#xA;+++&lt;/p&gt;</description>
+      <description></description>
     </item>
   </channel>
 </rss>
