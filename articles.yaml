@@ -19,7 +19,7 @@ series:
         title_fr: "Clean Architecture"
         slug: "clean-architecture"
         tags: ["architecture", "dotnet", "clean-architecture"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Vertical Slicing"
         title_fr: "Découpage Vertical"
