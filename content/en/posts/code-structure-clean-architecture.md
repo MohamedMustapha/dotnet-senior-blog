@@ -96,7 +96,7 @@ Notice what is **not** there: no `[Table]` attribute, no `DbContext`, no `virtua
 
 ## Zoom: Application, the use cases
 
-The Application layer describes what the system *does*, expressed as use cases. This is where commands and queries live, where transactions are coordinated, and where you declare the *ports* (interfaces) that Infrastructure will plug into.
+The Application layer describes what the system *does*, expressed as use cases. This is where commands and queries live, where transactions are coordinated, and where you declare the *ports* (interfaces) that Infrastructure will plug into. If the command/query split is new to you, the dedicated article [CQRS Explained for .NET Developers](/posts/cqrs-explained/) covers the pattern in depth, this section just assumes the shape.
 
 ```csharp
 // Application/Orders/SubmitOrder/SubmitOrderCommand.cs
