@@ -10,13 +10,13 @@ description: "Des tests unitaires qui attrapent de vrais bugs, tournent en milli
 
 Hello tous le monde, aujourd'hui on va démystifier les **tests unitaires** en .NET.
 
-Les tests unitaires, c'est les tests les moins chers à écrire, et les premiers à pourrir quand personne ne les entretient. Une suite de tests qui casse au moindre renommage de variable, qui mocke tout jusqu'à en perdre son sens, et qui met quatre secondes pour une seule assertion, c'est pire que pas de tests du tout. L'objectif de cet article, c'est de t'aider à écrire l'autre catégorie : rapides, ciblés, et sur lesquels tu peux vraiment t'appuyer pendant un refactoring.
+Les tests unitaires, c'est les tests les moins chers à écrire, et les premiers à pourrir quand personne ne les entretient. Une suite de tests qui casse au moindre renommage de variable, qui mocke tout jusqu'à en perdre son sens, et qui met quatre secondes pour une seule assertion, apporte moins de valeur que pas de tests du tout. L'objectif de cet article, c'est de t'aider à écrire l'autre catégorie : rapides, ciblés, et sur lesquels tu peux vraiment t'appuyer pendant un refactoring.
 
 L'histoire du testing .NET est mature. xUnit.net a été lancé par James Newkirk en 2007, après qu'il ait co-créé NUnit, comme une réécriture qui nettoyait dix ans d'habitudes accumulées. C'est devenu le framework de test par défaut dans les templates ASP.NET Core vers 2016, et .NET 10 livre xUnit v3 comme version majeure courante. Autour, FluentAssertions (pour des asserts lisibles), NSubstitute ou Moq (pour les mocks), et Bogus (pour générer des données de test) composent la boîte à outils standard.
 
 ## Le contexte : pourquoi les tests unitaires existent
 
-Supposons que nous ayons une équipe qui livre un moteur de pricing. Les règles s'empilent : taxes régionales, remises par volume, multiplicateurs de fidélité, promotions. Au bout de six mois, personne n'ose plus toucher `PriceCalculator.Calculate()` parce qu'une ligne mal placée pourrait surfacturer des milliers de clients en silence. Chaque changement passe par trois jours de QA manuelle. Les features avancent au ralenti.
+Supposons que nous ayons une équipe qui livre un moteur de pricing. Les règles s'empilent : taxes régionales, remises par volume, multiplicateurs de fidélité, promotions. Au bout de six mois, personne n'ose plus toucher `PriceCalculator.Calculate()` parce qu'une ligne mal placée pourrait surfacturer des milliers de clients en silence. Chaque changement passe par trois jours de QA manuelle. La vélocité de livraison en prend un coup visible.
 
 Ce qu'il faut vraiment à cette équipe :
 
@@ -73,7 +73,7 @@ public class PriceCalculatorTests
 
 Trois choses font que ce test est bon : le nom décrit le *comportement*, pas la méthode ; l'arrange est minimal ; l'assert vérifie un seul résultat. Si quelqu'un change les entrailles de `PriceCalculator` demain, ce test continue de passer tant que la règle tient.
 
-> 💡 **Info** : L'attribut `[Fact]` marque un test sans paramètre. Pour plusieurs inputs, utilise `[Theory]` avec `[InlineData]` ou `[MemberData]`. Ce n'est pas du sucre syntaxique, c'est tout l'intérêt des tests paramétrés.
+> 💡 **Info** : L'attribut `[Fact]` marque un test sans paramètre. Pour plusieurs inputs, utilise `[Theory]` avec `[InlineData]` ou `[MemberData]`. Ce n'est pas du sucre syntaxique, c'est précisément ce pour quoi les tests paramétrés existent.
 
 > ✅ **Bonne pratique** : Nomme tes tests en `Methode_etat_resultat` ou en phrases claires comme `applique_une_remise_de_volume_au_dessus_de_10_articles`. La sortie du runner de test, c'est de la documentation pour toi demain matin.
 
@@ -105,7 +105,7 @@ Une seule méthode de test, quatre cas, quatre lignes dans le runner. Ajouter un
 
 ## Zoom : mocker, mais prudemment
 
-Le mocking, c'est la technique la plus abusée du testing. La règle est simple : mocke les **frontières**, pas le **comportement**. Une frontière, c'est une interface vers laquelle ton SUT appelle (repository, client HTTP, provider de temps). Tout le reste doit être réel.
+Le mocking, c'est la technique la plus souvent mal employée dans les tests. La règle est simple : mocke les **frontières**, pas le **comportement**. Une frontière, c'est une interface vers laquelle ton SUT appelle (repository, client HTTP, provider de temps). Tout le reste doit être réel.
 
 ```csharp
 [Fact]
@@ -178,7 +178,7 @@ service.IsActive(new Promotion { EndsAt = DateTimeOffset.Parse("2026-04-09T00:00
 
 ## Wrap-up
 
-Tu sais maintenant écrire des tests unitaires qui gagnent vraiment leur place : scopés sur un seul comportement, avec le layout AAA, en mockant uniquement les frontières, qui tournent en millisecondes, et qui survivent aux refactorings sans tout réécrire. Tu peux choisir xUnit v3 + FluentAssertions + NSubstitute comme défaut safe, utiliser `[Theory]` pour les tables d'inputs, injecter `TimeProvider` au lieu de taper l'horloge système, et reconnaître les cas où un test unitaire est carrément le mauvais outil.
+Tu sais maintenant écrire des tests unitaires qui gagnent vraiment leur place : scopés sur un seul comportement, avec le layout AAA, en mockant uniquement les frontières, qui tournent en millisecondes, et qui survivent aux refactorings sans tout réécrire. Tu peux choisir xUnit v3 + FluentAssertions + NSubstitute comme défaut safe, utiliser `[Theory]` pour les tables d'inputs, injecter `TimeProvider` au lieu de taper l'horloge système, et reconnaître les cas où un test unitaire n'est pas le bon outil.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 

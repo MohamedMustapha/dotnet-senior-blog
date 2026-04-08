@@ -165,7 +165,7 @@ C'est là que TestContainers gagne sa place. Trois exemples concrets de choses q
 
 ### Comportement spécifique à Postgres : recherche floue avec pg_trgm
 
-Tu as un endpoint de recherche qui trouve des clients par nom approximatif avec l'extension `pg_trgm`. Aucun mock sur terre ne reproduit le ranking de `similarity()`. La seule façon de le tester, c'est contre un vrai Postgres.
+Tu as un endpoint de recherche qui trouve des clients par nom approximatif avec l'extension `pg_trgm`. Aucun mock ne peut reproduire le ranking de `similarity()`. La seule façon de le tester, c'est contre un vrai Postgres.
 
 ```csharp
 public sealed class SearchFixture : IAsyncLifetime
@@ -214,7 +214,7 @@ Le test prouve que l'extension est installée, que l'index est utilisé, et que 
 
 ### Keycloak avec un vrai realm, utilisateurs, rôles et clients
 
-L'autorisation par rôle, c'est notoirement pénible à tester. "Est-ce que `/admin/users` refuse un non-admin ?" demandait autrefois un Keycloak partagé, un realm curé à la main, et une convention que personne ne documentait. Avec TestContainers, tu importes un JSON de realm au démarrage du container, et tu obtiens tout : utilisateurs, mots de passe, rôles, clients, client scopes, mappers.
+L'autorisation par rôle est difficile à tester correctement. "Est-ce que `/admin/users` refuse un non-admin ?" demandait autrefois un Keycloak partagé, un realm curé à la main, et une convention que personne ne documentait. Avec TestContainers, tu importes un JSON de realm au démarrage du container, et tu obtiens tout : utilisateurs, mots de passe, rôles, clients, client scopes, mappers.
 
 ```csharp
 public sealed class KeycloakFixture : IAsyncLifetime

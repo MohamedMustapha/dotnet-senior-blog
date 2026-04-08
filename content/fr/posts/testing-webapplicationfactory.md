@@ -5,7 +5,7 @@ draft: false
 tags: ["testing", "api", "webapplicationfactory", "dotnet"]
 categories: ["Testing"]
 series: ["Tests"]
-description: "Teste ton vrai pipeline ASP.NET Core de bout en bout, in-process, sans Kestrel ni port HTTP. WebApplicationFactory, c'est le sweet spot entre les tests unitaires et le E2E."
+description: "Teste ton vrai pipeline ASP.NET Core de bout en bout, in-process, sans Kestrel ni port HTTP. WebApplicationFactory se place entre les tests unitaires et le E2E, et pour la plupart des besoins de test d'API, c'est là que le meilleur rapport effort/valeur se trouve."
 ---
 
 Hello tous le monde, aujourd'hui on va comprendre les **tests API avec WebApplicationFactory** en ASP.NET Core.

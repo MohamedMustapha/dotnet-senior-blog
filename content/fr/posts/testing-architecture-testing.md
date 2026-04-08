@@ -165,7 +165,7 @@ public class ApplicationArchitectureTests
 }
 ```
 
-`OnlyBeAccessedBy` est exactement le genre de règle pénible à écrire à la main et triviale avec ArchUnitNET. La règle dit "les handlers sont un détail d'implémentation privé, seul MediatR devrait y toucher", ce qui est exactement le comportement attendu d'un codebase CQRS.
+`OnlyBeAccessedBy` est exactement le genre de règle laborieuse à exprimer à la main et triviale avec ArchUnitNET. La règle dit "les handlers sont un détail d'implémentation privé, seul MediatR devrait y toucher", ce qui est exactement le comportement attendu d'un codebase CQRS.
 
 > 💡 **Info** : ArchUnitNET charge l'assembly une fois dans un modèle in-memory, donc chaque règle tourne contre le même graphe. Pour un codebase avec 50 tests d'architecture, c'est nettement plus rapide que NetArchTest, qui reparcourt les types à chaque assertion.
 

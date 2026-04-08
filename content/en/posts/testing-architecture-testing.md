@@ -163,7 +163,7 @@ public class ApplicationArchitectureTests
 }
 ```
 
-`OnlyBeAccessedBy` is the kind of rule that is painful to write by hand and trivial with ArchUnitNET. The rule says "handlers are a private implementation detail, only MediatR should reach them", which is exactly how you want a CQRS codebase to behave.
+`OnlyBeAccessedBy` is the kind of rule that is awkward to express by hand and trivial with ArchUnitNET. The rule says "handlers are a private implementation detail, only MediatR should reach them", which is exactly how you want a CQRS codebase to behave.
 
 > 💡 **Info** : ArchUnitNET loads the assembly once into an in-memory model, so every rule runs against the same graph. For a codebase with 50 architecture tests, it is noticeably faster than NetArchTest, which re-walks types per assertion.
 

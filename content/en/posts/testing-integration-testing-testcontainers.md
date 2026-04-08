@@ -163,7 +163,7 @@ This is where TestContainers earns its place. Three concrete examples of things 
 
 ### Postgres-specific behavior: fuzzy search with pg_trgm
 
-You have a search endpoint that finds customers by approximate name using the `pg_trgm` extension. No mock on earth reproduces the ranking of `similarity()`. The only way to test it is against real Postgres.
+You have a search endpoint that finds customers by approximate name using the `pg_trgm` extension. No mock can reproduce the ranking of `similarity()`. The only way to test it is against real Postgres.
 
 ```csharp
 public sealed class SearchFixture : IAsyncLifetime

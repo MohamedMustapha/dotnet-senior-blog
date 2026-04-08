@@ -8,13 +8,13 @@ series: ["Testing"]
 description: "Unit tests that catch real bugs, run in milliseconds, and survive refactors. xUnit, the AAA pattern, mocking trade-offs, and what to never test."
 ---
 
-Unit tests are the cheapest test you can write and the first ones that rot when nobody maintains them. A test suite full of tests that break every time you rename a variable, that mock everything into meaninglessness, and that take four seconds to run a single assertion is worse than no tests at all. The goal of this article is to help you write the other kind: fast, focused, and the kind you actually rely on during a refactor.
+Unit tests are the cheapest test you can write and the first ones that rot when nobody maintains them. A test suite full of tests that break every time you rename a variable, that mock everything into meaninglessness, and that take four seconds to run a single assertion brings less value than having no tests at all. The goal of this article is to help you write the other kind: fast, focused, and the kind you actually rely on during a refactor.
 
 The .NET unit testing story is mature. xUnit.net was started by James Newkirk in 2007 after he co-created NUnit, as a rewrite that removed a decade of accumulated habits. It became the default test framework in ASP.NET Core templates around 2016, and .NET 10 ships with xUnit v3 as the current major version. Around it, FluentAssertions (for readable asserts), NSubstitute or Moq (for mocks), and Bogus (for test data) make up the standard toolkit.
 
 ## Why unit tests exist
 
-Picture a team shipping a pricing engine. Rules pile up: regional taxes, volume discounts, loyalty multipliers, promotional overrides. After six months, nobody dares touch `PriceCalculator.Calculate()` because one wrong line could silently overcharge thousands of customers. Every change goes through a three-day manual QA pass. Features slow to a crawl.
+Picture a team shipping a pricing engine. Rules pile up: regional taxes, volume discounts, loyalty multipliers, promotional overrides. After six months, nobody dares touch `PriceCalculator.Calculate()` because one wrong line could silently overcharge thousands of customers. Every change goes through a three-day manual QA pass. Delivery velocity drops measurably.
 
 What the team actually needs:
 
@@ -71,7 +71,7 @@ public class PriceCalculatorTests
 
 Three things make this test good: the name describes the *behavior*, not the method; the arrange is minimal; the assert checks one outcome. If someone changes `PriceCalculator` internals tomorrow, this test still passes as long as the rule holds.
 
-> 💡 **Info** : The `[Fact]` attribute marks a parameterless test. For multiple inputs, use `[Theory]` with `[InlineData]` or `[MemberData]`. It is not syntactic sugar, it is the whole point of parameterized tests.
+> 💡 **Info** : The `[Fact]` attribute marks a parameterless test. For multiple inputs, use `[Theory]` with `[InlineData]` or `[MemberData]`. It is not syntactic sugar, it is precisely what parameterized tests exist for.
 
 > ✅ **Good practice** : Name tests as `MethodName_state_expectedOutcome` or in plain sentences like `applies_volume_discount_above_10_items`. Your test runner output is documentation for future-you.
 
@@ -103,7 +103,7 @@ One test method, four test cases, four rows in the runner. Adding a new tier is 
 
 ## Zoom: mocking, carefully
 
-Mocking is the most abused technique in unit testing. The rule is simple: mock **boundaries**, not **behavior**. A boundary is an interface your SUT calls out to (repository, HTTP client, time provider). Everything else should be real.
+Mocking is the most frequently misapplied technique in unit testing. The rule is simple: mock **boundaries**, not **behavior**. A boundary is an interface your SUT calls out to (repository, HTTP client, time provider). Everything else should be real.
 
 ```csharp
 [Fact]
@@ -176,7 +176,7 @@ service.IsActive(new Promotion { EndsAt = DateTimeOffset.Parse("2026-04-09T00:00
 
 ## Wrap-up
 
-You now know how to write unit tests that actually earn their keep: scoped to a single behavior, using the AAA layout, mocking only at boundaries, running in milliseconds, and surviving refactors without rewriting. You can pick xUnit v3 plus FluentAssertions plus NSubstitute as a safe default, use `[Theory]` for input tables, inject `TimeProvider` instead of hitting the system clock, and recognize the cases where a unit test is the wrong tool entirely.
+You now know how to write unit tests that actually earn their keep: scoped to a single behavior, using the AAA layout, mocking only at boundaries, running in milliseconds, and surviving refactors without rewriting. You can pick xUnit v3 plus FluentAssertions plus NSubstitute as a safe default, use `[Theory]` for input tables, inject `TimeProvider` instead of hitting the system clock, and recognize the cases where a unit test is not the right tool.
 
 Ready to level up your next project or share it with your team? See you in the next one, Integration Testing with TestContainers is where we go next.
 

@@ -10,7 +10,7 @@ description: "Des tests end-to-end pilotés par un vrai navigateur en .NET avec 
 
 Hello tous le monde, aujourd'hui on va découvrir les **tests end-to-end avec Playwright** pour .NET.
 
-Les tests end-to-end ont une mauvaise réputation bien méritée. Dix ans de suites Selenium flakys, des implicit waits qui n'attendent jamais tout à fait assez, des sélecteurs XPath qui cassent à chaque refresh d'UI, et des runs de CI qui plantent "parfois" ont convaincu beaucoup d'équipes que le E2E ne valait pas le coup. Ils avaient raison à propos de Selenium. Ils avaient tort à propos du E2E.
+Les tests end-to-end ont acquis une réputation difficile au fil des années, et pour de bonnes raisons. Dix ans de suites Selenium flakys, des implicit waits qui n'attendent jamais tout à fait assez, des sélecteurs XPath qui cassent à chaque refresh d'UI, et des runs de CI qui plantent "parfois" ont convaincu beaucoup d'équipes que le E2E ne valait pas le coup. Ils avaient raison à propos de Selenium. Ils avaient tort à propos du E2E.
 
 Playwright a changé la donne. Microsoft l'a publié en 2020 comme successeur moderne de Puppeteer, et les bindings .NET ont suivi début 2021. Il embarque Chromium, Firefox et WebKit, fait de l'auto-wait sur les éléments avant d'agir, isole chaque test dans un contexte de navigateur frais, et livre un générateur de code qui enregistre tes actions en fichier de test. Si tu as lu les articles précédents sur [les tests unitaires](/fr/posts/testing-unit-testing/), [les tests d'intégration avec TestContainers](/fr/posts/testing-integration-testing-testcontainers/), et [les tests API avec WebApplicationFactory](/fr/posts/testing-webapplicationfactory/), tu as déjà les couches rapides, peu chères, in-process. Playwright, c'est le sommet de la pyramide : plus lent, mais la seule chose qui prouve que ton appli marche vraiment comme un utilisateur va l'utiliser.
 
@@ -82,7 +82,7 @@ public class CheckoutTests : PageTest
 
 ## Zoom : locators et auto-wait
 
-La killer feature de Playwright, c'est **l'auto-wait**. Chaque action (`ClickAsync`, `FillAsync`) attend que l'élément soit visible, activé et stable avant d'agir. Chaque assertion (`ToBeVisibleAsync`, `ToHaveTextAsync`) retry jusqu'à ce que la condition soit vraie ou qu'un timeout expire. Tu n'écris quasiment jamais d'attente explicite.
+La caractéristique la plus distinctive de Playwright, c'est **l'auto-wait**. Chaque action (`ClickAsync`, `FillAsync`) attend que l'élément soit visible, activé et stable avant d'agir. Chaque assertion (`ToBeVisibleAsync`, `ToHaveTextAsync`) retry jusqu'à ce que la condition soit vraie ou qu'un timeout expire. Tu n'écris quasiment jamais d'attente explicite.
 
 ```csharp
 // Playwright attend que le bouton existe, soit activé et visible.
@@ -129,7 +129,7 @@ public async Task Checkout_affiche_la_confirmation()
 
 Quand le bouton "Valider" devient "Passer commande" au trimestre suivant, tu changes une ligne dans `CheckoutPage.cs` et 40 tests continuent de passer.
 
-> 💡 **Info** : Ajoute des attributs `data-testid` dans tes composants Razor ou React pour les éléments sans nom accessible naturel. `GetByTestId("cart-line-1-qty")` est béton et survit à tout type de refactoring d'UI.
+> 💡 **Info** : Ajoute des attributs `data-testid` dans tes composants Razor ou React pour les éléments sans nom accessible naturel. `GetByTestId("cart-line-1-qty")` est stable et survit à la plupart des refactorings d'UI.
 
 ## Zoom : héberger l'appli sous test
 
@@ -167,7 +167,7 @@ L'option 1 est le sweet spot pour la plupart des équipes.
 
 ## Zoom : traces, vidéos, debug
 
-Quand un test échoue en CI, la trace viewer de Playwright vaut son pesant d'or. Active-la uniquement sur les tests qui plantent :
+Quand un test échoue en CI, la trace viewer de Playwright est précieuse. Active-la uniquement sur les tests qui plantent :
 
 ```csharp
 [SetUp]
