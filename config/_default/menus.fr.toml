@@ -4,12 +4,12 @@
   weight = 10
 
 [[main]]
-  name = "About"
+  name = "À propos"
   pageRef = "about"
   weight = 20
 
 [[main]]
-  name = "Categories"
+  name = "Catégories"
   pageRef = "categories"
   weight = 30
 
