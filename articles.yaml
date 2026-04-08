@@ -301,7 +301,7 @@ series:
         title_fr: "Tests Unitaires en .NET"
         slug: "unit-testing"
         tags: ["testing", "dotnet", "xunit"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Integration Testing with TestContainers"
         title_fr: "Tests d'Intégration avec TestContainers"
