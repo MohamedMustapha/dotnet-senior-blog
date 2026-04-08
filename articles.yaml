@@ -292,7 +292,7 @@ series:
         title_fr: "Compilation AOT en .NET"
         slug: "aot-compilation"
         tags: ["performance", "aot", "dotnet"]
-        status: "todo"
+        status: "done"
 
   - name: "Testing"
     slug: "testing"
