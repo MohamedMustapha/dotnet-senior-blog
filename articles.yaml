@@ -325,7 +325,7 @@ series:
         title_fr: "Tests d'Architecture en .NET"
         slug: "architecture-testing"
         tags: ["testing", "architecture", "dotnet"]
-        status: "todo"
+        status: "done"
 
   - name: "Load Testing"
     slug: "load-testing"
