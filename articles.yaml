@@ -1,0 +1,361 @@
+series:
+
+  - name: "Code Structure"
+    slug: "code-structure"
+    articles:
+      - title_en: "N-Layered Architecture"
+        title_fr: "Architecture N-Couches"
+        slug: "n-layered"
+        tags: ["architecture", "dotnet", "n-layered"]
+        status: "done"
+
+      - title_en: "UI / Repos / Services"
+        title_fr: "UI / Repos / Services"
+        slug: "ui-repos-services"
+        tags: ["architecture", "dotnet", "layered"]
+        status: "done"
+
+      - title_en: "Clean Architecture"
+        title_fr: "Clean Architecture"
+        slug: "clean-architecture"
+        tags: ["architecture", "dotnet", "clean-architecture"]
+        status: "todo"
+
+      - title_en: "Vertical Slicing"
+        title_fr: "Découpage Vertical"
+        slug: "vertical-slicing"
+        tags: ["architecture", "dotnet", "vertical-slicing"]
+        status: "todo"
+
+  - name: "Code Architecture"
+    slug: "code-architecture"
+    articles:
+      - title_en: "Monolith: Still a Valid Choice"
+        title_fr: "Le Monolithe : un choix toujours valide"
+        slug: "monolith"
+        tags: ["architecture", "dotnet", "monolith"]
+        status: "todo"
+
+      - title_en: "Modular Monolith"
+        title_fr: "Monolithe Modulaire"
+        slug: "modular-monolith"
+        tags: ["architecture", "dotnet", "modular-monolith"]
+        status: "todo"
+
+      - title_en: "Distributed Architecture"
+        title_fr: "Architecture Distribuée"
+        slug: "distributed-architecture"
+        tags: ["architecture", "dotnet", "distributed"]
+        status: "todo"
+
+      - title_en: "Microservices"
+        title_fr: "Microservices"
+        slug: "microservices"
+        tags: ["architecture", "dotnet", "microservices"]
+        status: "todo"
+
+  - name: "Authentication"
+    slug: "authentication"
+    articles:
+      - title_en: "ADFS: What It Is and How to Integrate It"
+        title_fr: "ADFS : c'est quoi et comment l'intégrer"
+        slug: "adfs"
+        tags: ["authentication", "adfs", "dotnet"]
+        status: "todo"
+
+      - title_en: "Keycloak: Open Source Identity for .NET"
+        title_fr: "Keycloak : l'identité open source pour .NET"
+        slug: "keycloak"
+        tags: ["authentication", "keycloak", "dotnet"]
+        status: "todo"
+
+      - title_en: "Microsoft Entra ID (formerly Azure AD)"
+        title_fr: "Microsoft Entra ID (ex Azure AD)"
+        slug: "entra-id"
+        tags: ["authentication", "entra-id", "azure", "dotnet"]
+        status: "todo"
+
+      - title_en: "Azure AD B2B: Collaborate Across Tenants"
+        title_fr: "Azure AD B2B : collaboration inter-tenant"
+        slug: "azure-b2b"
+        tags: ["authentication", "azure", "b2b", "dotnet"]
+        status: "todo"
+
+      - title_en: "Azure AD B2C: External Identity at Scale"
+        title_fr: "Azure AD B2C : identité externe à grande échelle"
+        slug: "azure-b2c"
+        tags: ["authentication", "azure", "b2c", "dotnet"]
+        status: "todo"
+
+  - name: "Observability"
+    slug: "observability"
+    articles:
+      - title_en: "Structured Logging with Serilog and Seq"
+        title_fr: "Logging Structuré avec Serilog et Seq"
+        slug: "structured-logging-serilog-seq"
+        tags: ["observability", "serilog", "seq", "dotnet"]
+        status: "todo"
+
+      - title_en: "Distributed Tracing with Jaeger and Tempo"
+        title_fr: "Tracing Distribué avec Jaeger et Tempo"
+        slug: "distributed-tracing-jaeger-tempo"
+        tags: ["observability", "tracing", "jaeger", "tempo", "dotnet"]
+        status: "todo"
+
+      - title_en: "Metrics with Prometheus and Grafana"
+        title_fr: "Métriques avec Prometheus et Grafana"
+        slug: "metrics-prometheus-grafana"
+        tags: ["observability", "prometheus", "grafana", "dotnet"]
+        status: "todo"
+
+  - name: "Error Handling"
+    slug: "error-handling"
+    articles:
+      - title_en: "Custom Exceptions in .NET"
+        title_fr: "Exceptions Personnalisées en .NET"
+        slug: "custom-exceptions"
+        tags: ["error-handling", "dotnet", "exceptions"]
+        status: "todo"
+
+      - title_en: "Global Error Handling in ASP.NET Core"
+        title_fr: "Gestion Globale des Erreurs en ASP.NET Core"
+        slug: "global-error-handling"
+        tags: ["error-handling", "dotnet", "middleware"]
+        status: "todo"
+
+      - title_en: "The Result Pattern"
+        title_fr: "Le Result Pattern"
+        slug: "result-pattern"
+        tags: ["error-handling", "dotnet", "result-pattern"]
+        status: "todo"
+
+      - title_en: "Where to Throw, Where to Log"
+        title_fr: "Quand lever une exception, quand logger"
+        slug: "throw-or-log"
+        tags: ["error-handling", "dotnet", "logging"]
+        status: "todo"
+
+  - name: "Database"
+    slug: "database"
+    articles:
+      - title_en: "EF Core: Configuration and Seeding"
+        title_fr: "EF Core : Configuration et Seed"
+        slug: "efcore-config-seed"
+        tags: ["database", "efcore", "dotnet"]
+        status: "todo"
+
+      - title_en: "EF Core: Migrations in Practice"
+        title_fr: "EF Core : les Migrations en pratique"
+        slug: "efcore-migrations"
+        tags: ["database", "efcore", "migrations", "dotnet"]
+        status: "todo"
+
+      - title_en: "EF Core: Read Optimization"
+        title_fr: "EF Core : Optimisation des Lectures"
+        slug: "efcore-read-optimization"
+        tags: ["database", "efcore", "performance", "dotnet"]
+        status: "todo"
+
+      - title_en: "Dapper: When and How"
+        title_fr: "Dapper : quand et comment l'utiliser"
+        slug: "dapper"
+        tags: ["database", "dapper", "dotnet"]
+        status: "todo"
+
+  - name: "Layer Focused"
+    slug: "layer-focused"
+    articles:
+      - title_en: "Endpoints: Controllers vs Minimal API"
+        title_fr: "Endpoints : Controllers vs Minimal API"
+        slug: "controllers-vs-minimal-api"
+        tags: ["endpoints", "controllers", "minimal-api", "dotnet"]
+        status: "todo"
+
+      - title_en: "Application Layer: CQS and CQRS"
+        title_fr: "Couche Application : CQS et CQRS"
+        slug: "cqs-cqrs"
+        tags: ["application-layer", "cqrs", "cqs", "dotnet"]
+        status: "todo"
+
+      - title_en: "Data Access: Repository Pattern or Not"
+        title_fr: "Accès aux Données : Repository Pattern ou pas"
+        slug: "repository-or-not"
+        tags: ["data-access", "repository", "dotnet"]
+        status: "todo"
+
+  - name: "Deployment"
+    slug: "deployment"
+    articles:
+      - title_en: "Docker for .NET: Dockerfile and Compose"
+        title_fr: "Docker pour .NET : Dockerfile et Compose"
+        slug: "docker-dockerfile-compose"
+        tags: ["deployment", "docker", "dotnet"]
+        status: "todo"
+
+      - title_en: "Docker Security Best Practices for .NET"
+        title_fr: "Docker : bonnes pratiques de sécurité pour .NET"
+        slug: "docker-security"
+        tags: ["deployment", "docker", "security", "dotnet"]
+        status: "todo"
+
+      - title_en: "Kubernetes Primer for .NET Developers"
+        title_fr: "Kubernetes : l'essentiel pour les devs .NET"
+        slug: "kubernetes-primer"
+        tags: ["deployment", "kubernetes", "dotnet"]
+        status: "todo"
+
+      - title_en: ".NET Aspire: Cloud-Native Made Simple"
+        title_fr: ".NET Aspire : le cloud-native simplifié"
+        slug: "dotnet-aspire"
+        tags: ["deployment", "aspire", "dotnet"]
+        status: "todo"
+
+  - name: "Hosting"
+    slug: "hosting"
+    articles:
+      - title_en: "Hosting on IIS: The Classic"
+        title_fr: "Hébergement sur IIS : le classique"
+        slug: "hosting-iis"
+        tags: ["hosting", "iis", "dotnet"]
+        status: "todo"
+
+      - title_en: "Hosting with Docker"
+        title_fr: "Hébergement avec Docker"
+        slug: "hosting-docker"
+        tags: ["hosting", "docker", "dotnet"]
+        status: "todo"
+
+      - title_en: "Hosting on Kubernetes"
+        title_fr: "Hébergement sur Kubernetes"
+        slug: "hosting-kubernetes"
+        tags: ["hosting", "kubernetes", "dotnet"]
+        status: "todo"
+
+      - title_en: "Azure Container Apps"
+        title_fr: "Azure Container Apps"
+        slug: "azure-container-apps"
+        tags: ["hosting", "azure", "containers", "dotnet"]
+        status: "todo"
+
+      - title_en: "Azure Web App"
+        title_fr: "Azure Web App"
+        slug: "azure-web-app"
+        tags: ["hosting", "azure", "dotnet"]
+        status: "todo"
+
+  - name: "C# Improvements"
+    slug: "csharp-improvements"
+    articles:
+      - title_en: "Records in C#"
+        title_fr: "Les Records en C#"
+        slug: "csharp-records"
+        tags: ["csharp", "records", "dotnet"]
+        status: "todo"
+
+      - title_en: "Primary Constructors"
+        title_fr: "Les Primary Constructors"
+        slug: "csharp-primary-constructors"
+        tags: ["csharp", "primary-constructors", "dotnet"]
+        status: "todo"
+
+      - title_en: "Switch Expressions and Pattern Matching"
+        title_fr: "Switch Expressions et Pattern Matching"
+        slug: "csharp-switch-pattern-matching"
+        tags: ["csharp", "switch", "pattern-matching", "dotnet"]
+        status: "todo"
+
+  - name: "Middleware"
+    slug: "middleware"
+    articles:
+      - title_en: "How the ASP.NET Core Middleware Pipeline Works"
+        title_fr: "Comment fonctionne le pipeline Middleware ASP.NET Core"
+        slug: "middleware-pipeline"
+        tags: ["middleware", "aspnetcore", "dotnet"]
+        status: "todo"
+
+      - title_en: "Writing Custom Middleware"
+        title_fr: "Ecrire un Middleware personnalisé"
+        slug: "custom-middleware"
+        tags: ["middleware", "aspnetcore", "dotnet"]
+        status: "todo"
+
+  - name: "Performance"
+    slug: "performance"
+    articles:
+      - title_en: "Zero Allocation in .NET"
+        title_fr: "Zero Allocation en .NET"
+        slug: "zero-allocation"
+        tags: ["performance", "dotnet", "memory"]
+        status: "todo"
+
+      - title_en: "AOT Compilation in .NET"
+        title_fr: "Compilation AOT en .NET"
+        slug: "aot-compilation"
+        tags: ["performance", "aot", "dotnet"]
+        status: "todo"
+
+  - name: "Testing"
+    slug: "testing"
+    articles:
+      - title_en: "Unit Testing in .NET"
+        title_fr: "Tests Unitaires en .NET"
+        slug: "unit-testing"
+        tags: ["testing", "dotnet", "xunit"]
+        status: "todo"
+
+      - title_en: "Integration Testing with TestContainers"
+        title_fr: "Tests d'Intégration avec TestContainers"
+        slug: "integration-testing-testcontainers"
+        tags: ["testing", "integration", "testcontainers", "dotnet"]
+        status: "todo"
+
+      - title_en: "API Testing with WebApplicationFactory"
+        title_fr: "Tests API avec WebApplicationFactory"
+        slug: "webapplicationfactory"
+        tags: ["testing", "api", "webapplicationfactory", "dotnet"]
+        status: "todo"
+
+      - title_en: "End-to-End Testing with Playwright"
+        title_fr: "Tests End-to-End avec Playwright"
+        slug: "e2e-playwright"
+        tags: ["testing", "e2e", "playwright", "dotnet"]
+        status: "todo"
+
+      - title_en: "Architecture Testing in .NET"
+        title_fr: "Tests d'Architecture en .NET"
+        slug: "architecture-testing"
+        tags: ["testing", "architecture", "dotnet"]
+        status: "todo"
+
+  - name: "Load Testing"
+    slug: "load-testing"
+    articles:
+      - title_en: "Load Testing Types: An Overview"
+        title_fr: "Les Types de Tests de Charge : vue d'ensemble"
+        slug: "load-testing-overview"
+        tags: ["load-testing", "performance", "dotnet"]
+        status: "todo"
+
+      - title_en: "Baseline Testing"
+        title_fr: "Le Baseline Testing"
+        slug: "load-testing-baseline"
+        tags: ["load-testing", "baseline", "performance"]
+        status: "todo"
+
+      - title_en: "Soak Testing"
+        title_fr: "Le Soak Testing"
+        slug: "load-testing-soak"
+        tags: ["load-testing", "soak", "performance"]
+        status: "todo"
+
+      - title_en: "Stress Testing"
+        title_fr: "Le Stress Testing"
+        slug: "load-testing-stress"
+        tags: ["load-testing", "stress", "performance"]
+        status: "todo"
+
+      - title_en: "Spike Testing"
+        title_fr: "Le Spike Testing"
+        slug: "load-testing-spike"
+        tags: ["load-testing", "spike", "performance"]
+        status: "todo"
