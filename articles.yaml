@@ -229,7 +229,7 @@ series:
         title_fr: "Hébergement sur Kubernetes"
         slug: "hosting-kubernetes"
         tags: ["hosting", "kubernetes", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Azure Container Apps"
         title_fr: "Azure Container Apps"
