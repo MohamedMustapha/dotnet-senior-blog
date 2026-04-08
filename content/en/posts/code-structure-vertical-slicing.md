@@ -9,11 +9,11 @@ description: "Stop splitting your codebase into Controllers, Services, and Repos
 
 Every layered pattern we have looked at in this series, [N-Layered](/en/posts/code-structure-n-layered/), [UI / Repositories / Services](/en/posts/code-structure-ui-repos-services/), and [Clean Architecture](/en/posts/code-structure-clean-architecture/), shares the same core assumption: the right way to split code is by *technical role*. Controllers over here, services over there, repositories in the back, entities in the middle. It is so ingrained in the .NET community that most developers never question it.
 
-Vertical Slicing questions it. Loudly. Its claim is simple: **features change together, so they should live together**. When you ship "submit an order", you touch a controller, a service, a validator, a query, a response DTO, and probably a database call. In a horizontal layout, those six pieces live in six different folders. In a vertical slice, they live in one. And once you try it on a real codebase, going back feels like wearing a jacket inside out.
+Vertical Slicing questions it directly. Its claim is simple: **features change together, so they should live together**. When you ship "submit an order", you touch a controller, a service, a validator, a query, a response DTO, and probably a database call. In a horizontal layout, those six pieces live in six different folders. In a vertical slice, they live in one. The idea was formalized by Jimmy Bogard around 2018, building on his experience with MediatR and CQRS in real .NET codebases, as a reaction to how much friction layered architectures added to everyday feature work.
 
 ## Why this pattern exists
 
-Picture a sprint planning. The team picks up four stories: "export invoices", "refund an order", "send a welcome email", and "mark a product as featured". In a horizontal architecture, each story bleeds across five folders. Two developers working on two stories end up touching `OrderService.cs` at the same time, fighting merge conflicts over a file neither of them really owns. A third developer ships a bug because they reused a method in `OrderRepository` that was tuned for a different feature. Code review is painful: reviewers have to jump between seven files to understand a single change.
+Picture a sprint planning. The team picks up four stories: "export invoices", "refund an order", "send a welcome email", and "mark a product as featured". In a horizontal architecture, each story crosses five folders. Two developers working on two stories end up editing `OrderService.cs` at the same time, resolving merge conflicts in a file neither of them fully owns. A third developer reuses a method in `OrderRepository` that was tuned for a different feature, and a subtle bug ships. Code review takes longer because reviewers have to jump between seven files to follow a single change. None of this is anyone's fault: it is the cost of organizing code by technical role when the work arrives feature by feature.
 
 The insight is that layered architectures optimize for the *axis of reuse*, which is rarely the axis of *change*. Features change. Layers do not. So why are we organizing around layers?
 
@@ -53,7 +53,7 @@ graph TD
 
 Two features, two folders, everything you need to ship one feature in one place. The only shared code is the `DbContext` and the domain entities, and that is on purpose.
 
-> 💡 **Info** — Vertical Slice Architecture was popularized by Jimmy Bogard, the creator of MediatR and AutoMapper. It is not a formal specification. It is a set of principles you apply with judgment, and the folder layout is just the visible part.
+> 💡 **Info** : Vertical Slice Architecture was popularized by Jimmy Bogard, the creator of MediatR and AutoMapper. It is not a formal specification. It is a set of principles you apply with judgment, and the folder layout is just the visible part.
 
 ## Zoom: a real slice, end to end
 
@@ -131,7 +131,7 @@ public static class SubmitOrderEndpoint
 
 Five files, one folder, one feature. If you need to understand the whole flow, open the folder and read top to bottom. If you need to change how an order is submitted, every line you will touch is within one directory. No grep tour.
 
-> ✅ **Good practice** — Keep the request, validator, handler, and response as `sealed` types scoped to the feature. Do not expose them outside. If another feature needs the same concept, it is often a sign you should not reuse: write a new command with the shape that fits the new use case.
+> ✅ **Good practice** : Keep the request, validator, handler, and response as `sealed` types scoped to the feature. Do not expose them outside. If another feature needs the same concept, it is often a sign you should not reuse: write a new command with the shape that fits the new use case.
 
 ## Zoom: the query side is even simpler
 
@@ -182,9 +182,9 @@ public sealed class GetOrderDetailsHandler
 
 One SQL query. One projection. Zero repositories. The read side does not pretend to respect the domain model, because it does not need to: there are no invariants to enforce when you are just displaying data.
 
-> 💡 **Info** — This is the **CQRS** idea applied at slice level. Commands go through the domain (to enforce invariants). Queries bypass it (for speed and simplicity). You do not need separate databases or event sourcing to get the benefit.
+> 💡 **Info** : This is the **CQRS** idea applied at slice level. Commands go through the domain (to enforce invariants). Queries bypass it (for speed and simplicity). You do not need separate databases or event sourcing to get the benefit.
 
-> ⚠️ **It works, but...** — Resist the urge to introduce a `ReadRepository` interface for queries. It adds a layer of indirection that no other feature will ever reuse. If you want to mock it for tests, mock the `DbContext` or use an in-memory provider.
+> ⚠️ **It works, but...** : Resist the urge to introduce a `ReadRepository` interface for queries. It adds a layer of indirection that no other feature will ever reuse. If you want to mock it for tests, mock the `DbContext` or use an in-memory provider.
 
 ## Zoom: where abstractions still live
 
@@ -215,7 +215,7 @@ src/
 
 Notice the absence of `Controllers/`, `Services/`, and `Repositories/` folders. Those shapes are emergent per feature, not enforced at the project level.
 
-> ✅ **Good practice** — Add a MediatR pipeline behavior for validation so every handler gets FluentValidation for free. One file in `Common/`, every slice benefits, no slice has to wire it up.
+> ✅ **Good practice** : Add a MediatR pipeline behavior for validation so every handler gets FluentValidation for free. One file in `Common/`, every slice benefits, no slice has to wire it up.
 
 ```csharp
 // Common/Behaviors/ValidationBehavior.cs
@@ -262,13 +262,13 @@ Extract only when:
 - The pattern is genuinely stable and has a clear name.
 - Extracting removes real risk, not just lines.
 
-> ❌ **Never do this** — Do not build a `BaseHandler<TCommand, TResponse>` with protected helpers shared across features. It looks clean on day one and becomes an untouchable blob by month six. Every slice should be independently deletable.
+> ❌ **Never do this** : Avoid building a `BaseHandler<TCommand, TResponse>` with protected helpers shared across features. It looks clean on day one, and by month six any change to the base class affects every slice at once, which is exactly the coupling Vertical Slicing is trying to avoid. Keep each slice independently deletable.
 
 ## Where Vertical Slicing starts to bite
 
 No pattern is free. The failure modes of Vertical Slicing are different from the layered patterns, and you should know them:
 
-- **No enforced domain boundaries**: nothing stops a handler from doing something sloppy, like bypassing a domain method and mutating an entity directly. You need discipline or architecture tests.
+- **No enforced domain boundaries**: nothing stops a handler from bypassing a domain method and mutating an entity directly. You need discipline or architecture tests to keep invariants where they belong.
 - **Discoverability for newcomers**: a dev used to "I need to change the order service, I open `OrderService.cs`" has to learn a new mental model. "I need to change how orders are submitted, I open `Features/Orders/SubmitOrder/`."
 - **Cross-slice coordination**: when a business rule spans four features, you have four places to update. Good naming and domain events help, but it is real work.
 - **Weak affordance for very small apps**: if you have fifteen endpoints and no real domain, a vertical slice layout feels like overkill. UI / Repos / Services is probably still the right call.

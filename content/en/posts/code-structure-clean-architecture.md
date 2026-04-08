@@ -7,7 +7,7 @@ series: ["Code Structure"]
 description: "Clean Architecture is not about four projects and a circle diagram. It is about one rule: dependencies point inward. Here is how to build it in .NET without the dogma."
 ---
 
-Clean Architecture has a branding problem. Half the .NET codebases that advertise it on the README are just N-Layered with fancier folder names, and the other half have drowned in interfaces, mappers, and three layers of DTOs to show a list of products. The actual idea, the one Robert Martin sketched in 2012, is much smaller and much more useful: **your business rules should not depend on your framework, your database, or your HTTP stack**. Everything else is implementation detail.
+Clean Architecture has a branding problem. Many .NET codebases that advertise it on the README are closer to N-Layered with renamed folders, and others grow enough interfaces, mappers, and DTO hops that a simple product listing becomes a multi-file expedition. Both outcomes are understandable: the pattern is often introduced without its original framing, and teams fill the gap with ceremony. The actual idea, the one Robert Martin formalized in 2012 (building on earlier work like Alistair Cockburn's Hexagonal Architecture from 2005 and Jeffrey Palermo's Onion Architecture from 2008), is much smaller and much more useful: **your business rules should not depend on your framework, your database, or your HTTP stack**. Everything else is implementation detail.
 
 If you have read the previous articles in this series, you already know the two patterns that came before: [N-Layered Architecture](/en/posts/code-structure-n-layered/) with its physically separated projects, and [UI / Repositories / Services](/en/posts/code-structure-ui-repos-services/) with its pragmatic single-project layering. Clean Architecture is what you reach for when those patterns start to leak and you need the compiler to hold the line between your domain and the outside world.
 
@@ -36,9 +36,9 @@ graph TD
     A --> D
 ```
 
-The arrows are the only thing that matters. **Everything points toward Domain.** Domain depends on nothing. Application depends only on Domain. Infrastructure implements interfaces declared in Application (or Domain). The Api project wires everything up at startup. If you get the arrows right, you have Clean Architecture. If you do not, you have four projects in a trench coat.
+The arrows are the only thing that matters. **Everything points toward Domain.** Domain depends on nothing. Application depends only on Domain. Infrastructure implements interfaces declared in Application (or Domain). The Api project wires everything up at startup. If you get the arrows right, you have Clean Architecture. If you do not, you have four projects that share the cost of the split without sharing the benefit.
 
-> 💡 **Info** — The original diagram has four concentric circles (Entities, Use Cases, Interface Adapters, Frameworks). In practice, most .NET teams collapse this to four csproj files: `Domain`, `Application`, `Infrastructure`, `Api`. That mapping is good enough and I will use it throughout this article.
+> 💡 **Info** : The original diagram has four concentric circles (Entities, Use Cases, Interface Adapters, Frameworks). In practice, most .NET teams collapse this to four csproj files: `Domain`, `Application`, `Infrastructure`, `Api`. That mapping is good enough and I will use it throughout this article.
 
 ## Zoom: Domain, the heart
 
@@ -89,9 +89,9 @@ public sealed class Order
 
 Notice what is **not** there: no `[Table]` attribute, no `DbContext`, no `virtual` keyword for lazy loading, no navigation property that assumes EF Core. The entity enforces its own invariants. Breaking a rule throws a domain exception, not an HTTP 400.
 
-> ✅ **Good practice** — Make constructors private or internal and expose factory methods (`Order.Create(...)`). This forces all callers through your invariant checks. There is no way to get a broken `Order` from the outside.
+> ✅ **Good practice** : Make constructors private or internal and expose factory methods (`Order.Create(...)`). This forces all callers through your invariant checks. There is no way to get a broken `Order` from the outside.
 
-> ❌ **Never do this** — Do not put `[Column]` or `[Required]` attributes on domain entities to "save time". The moment you do, your Domain project has a hard dependency on an ORM, and the whole pattern collapses. Use EF Core's fluent API inside Infrastructure instead.
+> ❌ **Never do this** : Do not put `[Column]` or `[Required]` attributes on domain entities to "save time". The moment you do, your Domain project gains a hard dependency on an ORM, and the invariant that Domain references nothing stops holding. The fluent API inside Infrastructure gives you the same mapping without leaking the framework into your entities.
 
 ## Zoom: Application, the use cases
 
@@ -147,9 +147,9 @@ public interface IOrderRepository
 }
 ```
 
-> 💡 **Info** — This is the **Dependency Inversion Principle** made physical. The high-level policy (Application) owns the abstraction. The low-level detail (Infrastructure) implements it. The arrow points from Infrastructure to Application, not the other way around.
+> 💡 **Info** : This is the **Dependency Inversion Principle** made physical. The high-level policy (Application) owns the abstraction. The low-level detail (Infrastructure) implements it. The arrow points from Infrastructure to Application, not the other way around.
 
-> ⚠️ **It works, but...** — You will see teams put all their interfaces in a separate `Application.Contracts` project "for reuse". Ninety percent of the time that project is imported only by Infrastructure and adds zero value. Keep interfaces with their use cases until you have a real second consumer.
+> ⚠️ **It works, but...** : You will see teams put all their interfaces in a separate `Application.Contracts` project "for reuse". Ninety percent of the time that project is imported only by Infrastructure and adds zero value. Keep interfaces with their use cases until you have a real second consumer.
 
 ## Zoom: Infrastructure, the plugs
 
@@ -195,7 +195,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
 }
 ```
 
-> ✅ **Good practice** — Mark your Infrastructure implementations `internal`. The only way the outside world should get an `IOrderRepository` is through DI. If a controller can `new OrderRepository(...)`, something is wrong.
+> ✅ **Good practice** : Mark your Infrastructure implementations `internal`. The only way the outside world should get an `IOrderRepository` is through DI. If a controller can `new OrderRepository(...)`, something is wrong.
 
 ## Zoom: Api, the composition root
 
@@ -236,7 +236,7 @@ public static class OrderEndpoints
 
 No business logic here. The endpoint parses the route, dispatches the command, and translates the result. If you need a different transport tomorrow, a gRPC service or a background worker, you write a new composition root and reuse Application and Domain untouched.
 
-> 💡 **Info** — `AddApplication` and `AddInfrastructure` are extension methods that live in their respective projects. That keeps each layer in charge of its own registrations, and the Api project does not need to know what a `DbContext` is.
+> 💡 **Info** : `AddApplication` and `AddInfrastructure` are extension methods that live in their respective projects. That keeps each layer in charge of its own registrations, and the Api project does not need to know what a `DbContext` is.
 
 ## The rule the compiler must enforce
 
@@ -264,7 +264,7 @@ public void Domain_should_not_depend_on_any_other_project()
 }
 ```
 
-> ✅ **Good practice** — Add one architecture test per layer. It takes five minutes with NetArchTest or ArchUnitNET and it catches the accidental `using Shop.Infrastructure;` that would otherwise rot the project for a year.
+> ✅ **Good practice** : Add one architecture test per layer. It takes five minutes with NetArchTest or ArchUnitNET and it catches the accidental `using Shop.Infrastructure;` before it quietly becomes load-bearing.
 
 ## When Clean Architecture is the wrong call
 

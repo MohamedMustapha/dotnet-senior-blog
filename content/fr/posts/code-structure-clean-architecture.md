@@ -9,7 +9,7 @@ description: "Clean Architecture, ce n'est pas quatre projets et un diagramme en
 
 Hello tous le monde, aujourd'hui on va démystifier la **Clean Architecture**, probablement le pattern le plus cité et le plus mal compris dans le monde .NET.
 
-Clean Architecture a un problème de branding. La moitié des codebases .NET qui l'affichent fièrement dans leur README sont en fait du N-Couches avec des noms de dossiers plus fancy, et l'autre moitié ont sombré sous les interfaces, les mappers, et trois couches de DTOs pour afficher une liste de produits. L'idée d'origine, celle que Robert Martin a esquissée en 2012, est beaucoup plus petite et beaucoup plus utile : **tes règles métier ne doivent dépendre ni de ton framework, ni de ta base de données, ni de ta stack HTTP**. Tout le reste, c'est du détail d'implémentation.
+Clean Architecture a un problème de branding. Beaucoup de codebases .NET qui l'affichent dans leur README ressemblent en fait à du N-Couches avec des dossiers renommés, et d'autres accumulent assez d'interfaces, de mappers et de sauts de DTOs pour qu'un simple listing produit devienne une expédition multi-fichiers. Ces deux situations s'expliquent facilement : le pattern est souvent introduit sans son cadrage d'origine, et les équipes comblent le vide avec du cérémonial. L'idée d'origine, celle que Robert Martin a formalisée en 2012 (en s'appuyant sur des travaux plus anciens comme l'Hexagonal Architecture d'Alistair Cockburn en 2005 et l'Onion Architecture de Jeffrey Palermo en 2008), est beaucoup plus petite et beaucoup plus utile : **tes règles métier ne doivent dépendre ni de ton framework, ni de ta base de données, ni de ta stack HTTP**. Tout le reste, c'est du détail d'implémentation.
 
 Si tu as lu les articles précédents de cette série, tu connais déjà les deux patterns qui sont venus avant : [l'architecture N-Couches](/fr/posts/code-structure-n-layered/) avec ses projets physiquement séparés, et [UI / Repositories / Services](/fr/posts/code-structure-ui-repos-services/) avec son découpage pragmatique à l'intérieur d'un seul projet. Clean Architecture, c'est ce que tu sors du placard quand ces patterns commencent à fuir et que tu as besoin du compilateur pour tenir la frontière entre ton domaine et le monde extérieur.
 
@@ -38,9 +38,9 @@ graph TD
     A --> D
 ```
 
-Les flèches, c'est la seule chose qui compte. **Tout pointe vers Domain.** Domain ne dépend de rien. Application ne dépend que de Domain. Infrastructure implémente les interfaces déclarées dans Application (ou dans Domain). Le projet Api fait le câblage au démarrage. Si les flèches sont bonnes, tu as de la Clean Architecture. Sinon, tu as juste quatre projets déguisés.
+Les flèches, c'est la seule chose qui compte. **Tout pointe vers Domain.** Domain ne dépend de rien. Application ne dépend que de Domain. Infrastructure implémente les interfaces déclarées dans Application (ou dans Domain). Le projet Api fait le câblage au démarrage. Si les flèches sont bonnes, tu as de la Clean Architecture. Sinon, tu as quatre projets qui te coûtent le découpage sans te rendre le bénéfice.
 
-> 💡 **Info** — Le diagramme d'origine montre quatre cercles concentriques (Entities, Use Cases, Interface Adapters, Frameworks). En pratique, la plupart des équipes .NET ramènent ça à quatre csproj : `Domain`, `Application`, `Infrastructure`, `Api`. Ce mapping est suffisant et c'est celui que j'utilise dans cet article.
+> 💡 **Info** : Le diagramme d'origine montre quatre cercles concentriques (Entities, Use Cases, Interface Adapters, Frameworks). En pratique, la plupart des équipes .NET ramènent ça à quatre csproj : `Domain`, `Application`, `Infrastructure`, `Api`. Ce mapping est suffisant et c'est celui que j'utilise dans cet article.
 
 ## Zoom : Domain, le cœur
 
@@ -91,9 +91,9 @@ public sealed class Order
 
 Remarque ce qui n'est **pas** là : pas d'attribut `[Table]`, pas de `DbContext`, pas de mot-clé `virtual` pour le lazy loading, pas de propriété de navigation qui présuppose EF Core. L'entité fait respecter ses propres invariants. Casser une règle lève une exception de domaine, pas un HTTP 400.
 
-> ✅ **Bonne pratique** — Mets tes constructeurs en privé ou internal et expose des méthodes factory (`Order.Create(...)`). Ça force tous les appelants à passer par tes vérifications d'invariants. Il n'y a aucun moyen d'obtenir un `Order` cassé depuis l'extérieur.
+> ✅ **Bonne pratique** : Mets tes constructeurs en privé ou internal et expose des méthodes factory (`Order.Create(...)`). Ça force tous les appelants à passer par tes vérifications d'invariants. Il n'y a aucun moyen d'obtenir un `Order` cassé depuis l'extérieur.
 
-> ❌ **Ne jamais faire** — Ne colle jamais d'attributs `[Column]` ou `[Required]` sur tes entités de domaine pour "gagner du temps". Dès que tu le fais, ton projet Domain a une dépendance dure sur un ORM, et tout le pattern s'écroule. Utilise plutôt l'API fluent d'EF Core à l'intérieur d'Infrastructure.
+> ❌ **Ne jamais faire** : Ne colle pas d'attributs `[Column]` ou `[Required]` sur tes entités de domaine pour "gagner du temps". Dès que tu le fais, ton projet Domain gagne une dépendance dure sur un ORM, et l'invariant "Domain ne référence rien" cesse d'être vrai. L'API fluent d'EF Core dans Infrastructure te donne le même mapping sans faire fuiter le framework jusque dans tes entités.
 
 ## Zoom : Application, les cas d'usage
 
@@ -149,9 +149,9 @@ public interface IOrderRepository
 }
 ```
 
-> 💡 **Info** — C'est le **Dependency Inversion Principle** rendu physique. La politique haute (Application) possède l'abstraction. Le détail bas (Infrastructure) l'implémente. La flèche va d'Infrastructure vers Application, et pas l'inverse.
+> 💡 **Info** : C'est le **Dependency Inversion Principle** rendu physique. La politique haute (Application) possède l'abstraction. Le détail bas (Infrastructure) l'implémente. La flèche va d'Infrastructure vers Application, et pas l'inverse.
 
-> ⚠️ **Ça marche, mais...** — Tu verras des équipes mettre toutes leurs interfaces dans un projet séparé `Application.Contracts`, "pour la réutilisation". Dans 90% des cas, ce projet n'est importé que par Infrastructure et n'apporte rien. Garde les interfaces à côté de leurs cas d'usage, tant que tu n'as pas un vrai second consommateur.
+> ⚠️ **Ça marche, mais...** : Tu verras des équipes mettre toutes leurs interfaces dans un projet séparé `Application.Contracts`, "pour la réutilisation". Dans 90% des cas, ce projet n'est importé que par Infrastructure et n'apporte rien. Garde les interfaces à côté de leurs cas d'usage, tant que tu n'as pas un vrai second consommateur.
 
 ## Zoom : Infrastructure, les prises
 
@@ -197,7 +197,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
 }
 ```
 
-> ✅ **Bonne pratique** — Marque tes implémentations d'Infrastructure en `internal`. La seule façon pour le monde extérieur d'obtenir un `IOrderRepository`, ça doit être via la DI. Si un controller peut faire `new OrderRepository(...)`, il y a un problème.
+> ✅ **Bonne pratique** : Marque tes implémentations d'Infrastructure en `internal`. La seule façon pour le monde extérieur d'obtenir un `IOrderRepository`, ça doit être via la DI. Si un controller peut faire `new OrderRepository(...)`, il y a un problème.
 
 ## Zoom : Api, la composition root
 
@@ -238,7 +238,7 @@ public static class OrderEndpoints
 
 Aucune logique métier ici. L'endpoint parse la route, dispatche la commande, traduit le résultat. Si tu dois changer de transport demain, un service gRPC ou un worker de fond, tu écris une nouvelle composition root et tu réutilises Application et Domain sans y toucher.
 
-> 💡 **Info** — `AddApplication` et `AddInfrastructure` sont des méthodes d'extension qui vivent dans leur projet respectif. Ça garde chaque couche en charge de ses propres enregistrements, et le projet Api n'a pas besoin de savoir ce qu'est un `DbContext`.
+> 💡 **Info** : `AddApplication` et `AddInfrastructure` sont des méthodes d'extension qui vivent dans leur projet respectif. Ça garde chaque couche en charge de ses propres enregistrements, et le projet Api n'a pas besoin de savoir ce qu'est un `DbContext`.
 
 ## La règle que le compilateur doit faire respecter
 
@@ -266,7 +266,7 @@ public void Domain_ne_doit_dependre_de_rien()
 }
 ```
 
-> ✅ **Bonne pratique** — Ajoute un test d'architecture par couche. Ça prend cinq minutes avec NetArchTest ou ArchUnitNET et ça attrape le `using Shop.Infrastructure;` accidentel qui sinon pourrirait le projet pendant un an.
+> ✅ **Bonne pratique** : Ajoute un test d'architecture par couche. Ça prend cinq minutes avec NetArchTest ou ArchUnitNET et ça attrape le `using Shop.Infrastructure;` accidentel avant qu'il ne devienne, en silence, un point d'appui du code.
 
 ## Quand Clean Architecture est le mauvais choix
 

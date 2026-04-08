@@ -11,11 +11,11 @@ Hello tous le monde, aujourd'hui on va découvrir le **Vertical Slicing**, le pa
 
 Tous les patterns en couches qu'on a vus jusqu'ici, le [N-Couches](/fr/posts/code-structure-n-layered/), le [UI / Repositories / Services](/fr/posts/code-structure-ui-repos-services/) et la [Clean Architecture](/fr/posts/code-structure-clean-architecture/), partagent la même hypothèse de base : la bonne façon de découper le code, c'est par *rôle technique*. Les controllers ici, les services là, les repositories au fond, les entités au milieu. C'est tellement ancré dans la communauté .NET que la plupart des devs ne remettent jamais ça en question.
 
-Le Vertical Slicing le remet en question, et pas à moitié. Son affirmation est simple : **les fonctionnalités changent ensemble, donc elles doivent vivre ensemble**. Quand tu livres "soumettre une commande", tu touches un controller, un service, un validator, une requête, un DTO de réponse, et probablement un appel à la base. Dans un découpage horizontal, ces six morceaux vivent dans six dossiers différents. Dans une tranche verticale, ils vivent dans un seul. Et une fois que tu l'as essayé sur un vrai codebase, revenir en arrière te donne l'impression d'enfiler une veste à l'envers.
+Le Vertical Slicing le remet directement en question. Son affirmation est simple : **les fonctionnalités changent ensemble, donc elles doivent vivre ensemble**. Quand tu livres "soumettre une commande", tu touches un controller, un service, un validator, une requête, un DTO de réponse, et probablement un appel à la base. Dans un découpage horizontal, ces six morceaux vivent dans six dossiers différents. Dans une tranche verticale, ils vivent dans un seul. L'idée a été formalisée par Jimmy Bogard vers 2018, en s'appuyant sur son expérience avec MediatR et CQRS sur de vrais codebases .NET, comme réponse à la friction que les architectures en couches ajoutent au travail quotidien sur les fonctionnalités.
 
 ## Le contexte : pourquoi ce pattern existe
 
-Supposons que nous soyons en planning de sprint. L'équipe prend quatre stories : "exporter les factures", "rembourser une commande", "envoyer un email de bienvenue", "mettre un produit en vedette". Dans une architecture horizontale, chaque story se promène dans cinq dossiers. Deux devs qui bossent sur deux stories finissent par toucher `OrderService.cs` en même temps, à se battre sur des conflits de merge dans un fichier qu'aucun des deux ne possède vraiment. Un troisième dev livre un bug parce qu'il a réutilisé une méthode dans `OrderRepository` qui était taillée pour une autre fonctionnalité. La revue de code est pénible : les relecteurs doivent sauter entre sept fichiers pour comprendre un seul changement.
+Supposons que nous soyons en planning de sprint. L'équipe prend quatre stories : "exporter les factures", "rembourser une commande", "envoyer un email de bienvenue", "mettre un produit en vedette". Dans une architecture horizontale, chaque story traverse cinq dossiers. Deux devs qui bossent sur deux stories finissent par éditer `OrderService.cs` en même temps, et à résoudre des conflits de merge dans un fichier qu'aucun des deux ne possède pleinement. Un troisième dev réutilise une méthode dans `OrderRepository` qui était taillée pour une autre fonctionnalité, et un bug subtil passe en prod. La revue de code prend plus de temps parce que les relecteurs doivent sauter entre sept fichiers pour suivre un seul changement. Rien de tout ça n'est la faute de quiconque : c'est le coût d'organiser le code par rôle technique quand le travail arrive fonctionnalité par fonctionnalité.
 
 L'insight, c'est que les architectures en couches optimisent pour l'*axe de réutilisation*, qui est rarement l'axe de *changement*. Les fonctionnalités changent. Les couches, pas vraiment. Alors pourquoi on s'organise autour des couches ?
 
@@ -55,7 +55,7 @@ graph TD
 
 Deux fonctionnalités, deux dossiers, tout ce qu'il faut pour livrer une feature au même endroit. Le seul code partagé, c'est le `DbContext` et les entités de domaine, et c'est fait exprès.
 
-> 💡 **Info** — Le Vertical Slice Architecture a été popularisé par Jimmy Bogard, le créateur de MediatR et AutoMapper. Ce n'est pas une spécification formelle. C'est un ensemble de principes à appliquer avec du jugement, et la disposition des dossiers n'est que la partie visible.
+> 💡 **Info** : Le Vertical Slice Architecture a été popularisé par Jimmy Bogard, le créateur de MediatR et AutoMapper. Ce n'est pas une spécification formelle. C'est un ensemble de principes à appliquer avec du jugement, et la disposition des dossiers n'est que la partie visible.
 
 ## Zoom : une vraie tranche, de bout en bout
 
@@ -133,7 +133,7 @@ public static class SubmitOrderEndpoint
 
 Cinq fichiers, un dossier, une fonctionnalité. Si tu dois comprendre tout le flux, tu ouvres le dossier et tu lis de haut en bas. Si tu dois changer la façon dont une commande est soumise, toutes les lignes que tu vas toucher sont dans le même répertoire. Pas de chasse au grep.
 
-> ✅ **Bonne pratique** — Garde la requête, le validator, le handler et la réponse en `sealed`, scopés à la fonctionnalité. Ne les expose pas à l'extérieur. Si une autre tranche a besoin du même concept, c'est souvent le signe qu'il ne faut *pas* réutiliser : écris une nouvelle commande avec la forme qui colle au nouveau cas.
+> ✅ **Bonne pratique** : Garde la requête, le validator, le handler et la réponse en `sealed`, scopés à la fonctionnalité. Ne les expose pas à l'extérieur. Si une autre tranche a besoin du même concept, c'est souvent le signe qu'il ne faut *pas* réutiliser : écris une nouvelle commande avec la forme qui colle au nouveau cas.
 
 ## Zoom : le côté lecture est encore plus simple
 
@@ -184,9 +184,9 @@ public sealed class GetOrderDetailsHandler
 
 Une seule requête SQL. Une seule projection. Zéro repository. Le côté lecture ne prétend pas respecter le modèle de domaine, parce qu'il n'en a pas besoin : il n'y a pas d'invariant à faire respecter quand tu affiches juste des données.
 
-> 💡 **Info** — C'est l'idée du **CQRS** appliquée au niveau de la tranche. Les commandes passent par le domaine (pour faire respecter les invariants). Les queries le court-circuitent (pour la vitesse et la simplicité). Pas besoin de bases de données séparées ou d'event sourcing pour en profiter.
+> 💡 **Info** : C'est l'idée du **CQRS** appliquée au niveau de la tranche. Les commandes passent par le domaine (pour faire respecter les invariants). Les queries le court-circuitent (pour la vitesse et la simplicité). Pas besoin de bases de données séparées ou d'event sourcing pour en profiter.
 
-> ⚠️ **Ça marche, mais...** — Résiste à la tentation d'introduire une interface `IReadRepository` pour les queries. Ça ajoute une couche d'indirection qu'aucune autre fonctionnalité ne réutilisera jamais. Si tu veux le mocker pour les tests, mocke le `DbContext` ou utilise un provider in-memory.
+> ⚠️ **Ça marche, mais...** : Résiste à la tentation d'introduire une interface `IReadRepository` pour les queries. Ça ajoute une couche d'indirection qu'aucune autre fonctionnalité ne réutilisera jamais. Si tu veux le mocker pour les tests, mocke le `DbContext` ou utilise un provider in-memory.
 
 ## Zoom : où vivent encore les abstractions
 
@@ -217,7 +217,7 @@ src/
 
 Remarque l'absence des dossiers `Controllers/`, `Services/` et `Repositories/`. Ces formes émergent par fonctionnalité, pas imposées au niveau du projet.
 
-> ✅ **Bonne pratique** — Ajoute un pipeline behavior MediatR pour la validation, comme ça chaque handler récupère FluentValidation gratuitement. Un fichier dans `Common/`, toutes les tranches en profitent, aucune tranche n'a à le câbler.
+> ✅ **Bonne pratique** : Ajoute un pipeline behavior MediatR pour la validation, comme ça chaque handler récupère FluentValidation gratuitement. Un fichier dans `Common/`, toutes les tranches en profitent, aucune tranche n'a à le câbler.
 
 ```csharp
 // Common/Behaviors/ValidationBehavior.cs
@@ -264,13 +264,13 @@ Extrais uniquement quand :
 - Le pattern est vraiment stable et a un nom clair.
 - L'extraction supprime un vrai risque, pas juste des lignes.
 
-> ❌ **Ne jamais faire** — Ne construis pas une `BaseHandler<TCommand, TResponse>` avec des helpers protégés partagés entre les fonctionnalités. Ça a l'air propre au jour 1 et ça devient un blob intouchable au bout de six mois. Chaque tranche doit pouvoir être supprimée indépendamment.
+> ❌ **Ne jamais faire** : Évite de construire une `BaseHandler<TCommand, TResponse>` avec des helpers protégés partagés entre les fonctionnalités. Ça a l'air propre au jour 1, et au bout de six mois le moindre changement sur la classe de base impacte toutes les tranches d'un coup, ce qui est exactement le couplage que le Vertical Slicing cherche à éviter. Garde chaque tranche indépendamment supprimable.
 
 ## Là où ça commence à faire mal
 
 Aucun pattern n'est gratuit. Les modes de défaillance du Vertical Slicing sont différents de ceux des patterns en couches, et il faut les connaître :
 
-- **Pas de frontières de domaine imposées** : rien n'empêche un handler de faire quelque chose de sale, comme court-circuiter une méthode de domaine et muter une entité directement. Il faut de la discipline, ou des tests d'architecture.
+- **Pas de frontières de domaine imposées** : rien n'empêche un handler de court-circuiter une méthode de domaine et de muter une entité directement. Il faut de la discipline, ou des tests d'architecture, pour garder les invariants à leur place.
 - **Discoverability pour les nouveaux** : un dev habitué à "je dois changer le service des commandes, j'ouvre `OrderService.cs`" doit apprendre un nouveau modèle mental. "Je dois changer la façon dont les commandes sont soumises, j'ouvre `Features/Orders/SubmitOrder/`."
 - **Coordination inter-tranches** : quand une règle métier s'étend sur quatre fonctionnalités, tu as quatre endroits à mettre à jour. Un bon nommage et les événements de domaine aident, mais c'est du vrai boulot.
 - **Peu d'intérêt sur des très petites applis** : si tu as quinze endpoints et pas de vrai domaine, un découpage en tranches verticales a un côté overkill. UI / Repos / Services reste probablement le bon choix.
