@@ -5,26 +5,32 @@ draft: false
 tags: ["testing", "integration", "testcontainers", "dotnet"]
 categories: ["Testing"]
 series: ["Tests"]
-description: "De vraies bases de données, un vrai Redis, de vrais brokers, démarrés par run de test en quelques secondes. TestContainers pour .NET enterre le 'ça marche sur ma machine' pour les tests d'intégration."
+description: "De vraies bases de données, un vrai Redis, de vrais brokers, un vrai Keycloak, provisionnés par run de test. TestContainers pour .NET transforme les faux tests d'intégration en vrais, sans infrastructure partagée."
 ---
 
 Hello tous le monde, aujourd'hui on va explorer les **tests d'intégration avec TestContainers** pour .NET.
 
-Les tests d'intégration, ça a longtemps été la pire partie d'un projet .NET. Un SQL Server de dev partagé que trois équipes se disputaient. Un docker-compose que tout le monde lançait "correctement" en local, jusqu'à ce qu'il dérive. Une CI avec une chaîne de connexion codée en dur qui marchait uniquement le mardi. Résultat : personne ne faisait confiance aux tests, et l'équipe se rabattait à mocker la base et à faire semblant. Si tu as lu l'article précédent sur [les tests unitaires en .NET](/fr/posts/testing-unit-testing/), tu sais déjà pourquoi ce repli est une fausse bonne idée : les bugs EF Core vivent dans le SQL généré, et tu ne peux pas les attraper en mockant `DbContext`.
+Le test d'intégration est historiquement la discipline la plus compromise de la delivery .NET. Pas parce que les ingénieurs ne s'en souciaient pas, mais parce que les outils disponibles imposaient un choix entre une infrastructure partagée fragile et des tests qui, sans le dire, cessaient d'être des tests d'intégration. Si tu as lu l'article précédent sur [les tests unitaires en .NET](/fr/posts/testing-unit-testing/), tu sais déjà que mocker un `DbContext` ne peut pas attraper les bugs qui vivent dans le SQL généré. Ce que le métier attendait, c'était un moyen d'exécuter des tests d'intégration contre les vrais services auxquels ils prétendent s'intégrer, de façon reproductible, sans coordonner un environnement partagé.
 
-TestContainers règle ce problème. La bibliothèque Java d'origine a été publiée en 2015 par Richard North, et le port .NET est arrivé en 2017 sous le nom Testcontainers for .NET. C'est aujourd'hui le standard officiel, maintenu sous l'organisation GitHub `testcontainers`, et .NET 10 le traite comme un outil de test d'intégration de première classe. L'idée est simple : ton code de test démarre un vrai Postgres / Redis / RabbitMQ / peu importe dans un container Docker jetable, attend qu'il soit prêt, te refile une chaîne de connexion, et le détruit quand la fixture de test se libère.
+TestContainers fournit exactement cela. La bibliothèque Java d'origine a été publiée en 2015 par Richard North, et le port .NET est arrivé en 2017 sous le nom Testcontainers for .NET. C'est aujourd'hui le standard de référence, maintenu sous l'organisation GitHub `testcontainers`, et .NET 10 le traite comme un outil de test d'intégration de première classe. Le principe est direct : ton code de test démarre un vrai Postgres, Redis, RabbitMQ, Keycloak, ou n'importe quel autre service dans un container Docker éphémère, attend qu'il devienne prêt, expose ses informations de connexion, et le détruit quand la fixture de test se libère.
 
 ## Le contexte : pourquoi ce pattern existe
 
-Supposons que nous ayons une équipe dont les tests d'intégration tournent contre une instance SQL Server partagée sur une VM de dev. Un test laisse une ligne derrière lui. Un autre test suppose que la ligne n'existe pas. Mardi matin, tout explose. Quelqu'un patche le test avec `DELETE FROM Orders WHERE ...` et le cycle recommence. Six mois plus tard, la moitié de la suite est désactivée.
+Pendant la plus grande partie de l'histoire de .NET, écrire un test d'intégration honnête impliquait d'accepter cinq problèmes structurels, dont aucun n'avait de solution propre.
 
-Ce qu'il faut vraiment à cette équipe :
+**1. Une infrastructure de dev ou d'intégration partagée.** La base, le fournisseur d'identité, le broker de messages, le stockage objet : tout vivait sur un environnement central vers lequel chaque développeur et chaque job de CI pointait. Lancer deux suites de tests en parallèle était un vrai risque : les fixtures d'un ingénieur entraient en collision avec celles d'un autre, un script de cleanup effaçait une ligne dont quelqu'un dépendait, et un test flaky ressemblait soudain à une vraie régression. Les équipes se défendaient avec des systèmes de verrous, des conventions de nommage, et des contrats sociaux implicites qui se cassaient à l'arrivée du premier nouvel arrivant.
 
-1. **Une vraie base de données**, pour que les migrations EF Core, les indexes et les requêtes tournent contre le moteur qui sera en prod.
-2. **De l'isolation par run de test**, pour que personne ne laisse d'état à personne.
-3. **Une expérience développeur en une commande**, pour qu'un nouvel arrivant clone le repo, lance `dotnet test`, et que tout marche.
+**2. La CI/CD devait avoir un accès réseau à ces services partagés.** Les agents de build avaient besoin de routes vers la base de dev, de credentials renouvelés à la main, et de règles de firewall maintenues par une autre équipe. Chaque nouveau pipeline devenait un ticket. Chaque panne de l'infra partagée bloquait tous les builds. La disponibilité de la suite de tests était plafonnée par celle du service le moins fiable qu'elle appelait.
 
-TestContainers livre les trois en déléguant la partie compliquée à Docker.
+**3. Le setup se cassait avec une facilité déconcertante.** Un simple `ALTER TABLE` appliqué par un ingénieur en debug, un changement de rôle dans Keycloak, une expiration de certificat SSL sur le relais SMTP, un snapshot Redis obsolète : n'importe lequel invalidait silencieusement la suite pour tout le monde. Les matinées commençaient par la question "la CI est rouge à cause de mon changement, ou parce que quelqu'un a touché à l'environnement de test ?".
+
+**4. Elle exigeait un cleanup et un entretien permanents de la part des développeurs eux-mêmes.** Les scripts de seed dérivaient par rapport aux migrations. Les utilisateurs de test s'accumulaient dans le fournisseur d'identité. Les lignes orphelines s'empilaient dans les tables de jointure. Quelqu'un dans l'équipe finissait par être le gardien officieux de l'environnement d'intégration, et son temps n'était jamais compté dans la planification.
+
+**5. Et surtout : toute dépendance qui n'avait pas de package NuGet in-memory était mockée.** C'est la conséquence la plus grave, et celle que personne n'aime reconnaître. Si ton service parlait à SQL Server, tu avais `Microsoft.EntityFrameworkCore.InMemory` et tu faisais comme si ça comptait, alors qu'il ignore silencieusement les foreign keys, la sensibilité à la casse, et tout ce qui est spécifique au SQL. S'il parlait à Keycloak, tu mockais `IAuthenticationService`. S'il parlait à MinIO, tu mockais `IAmazonS3`. S'il parlait à RabbitMQ, tu mockais `IBus`. Les suites étaient étiquetées "tests d'intégration" et étaient, en pratique, **de faux tests d'intégration** : elles exerçaient ton code contre une fiction que tu avais écrite toi-même. Le jour où la vraie dépendance se comportait différemment, les tests restaient silencieux.
+
+TestContainers démonte les cinq points d'un coup. Il remplace l'infrastructure partagée par des containers provisionnés par run, supprime la dépendance de la CI à des services externes (l'agent n'a besoin que de Docker), rend le setup reproductible depuis le code au lieu d'une page de wiki, déplace le cleanup de "la discipline des développeurs" vers "la disposition des containers", et, surtout, supprime la dernière excuse pour mocker une dépendance qui a une image Docker : Postgres avec `pg_trgm`, Keycloak avec un realm complet, MinIO pour S3, RabbitMQ, Kafka, Mongo, Elasticsearch. Si l'outil a une image, tu testes contre la vraie chose.
+
+Le reste de cet article explique comment faire cela proprement.
 
 ## Vue d'ensemble : comment ça se branche
 
@@ -84,7 +90,7 @@ public sealed class PostgresFixture : IAsyncLifetime
 
 `IAsyncLifetime`, c'est le hook xUnit pour le setup et le teardown async. `StartAsync()` télécharge l'image (cachée après le premier run) et attend que Postgres soit prêt. Ensuite, EF Core applique tes vraies migrations dessus.
 
-> ✅ **Bonne pratique** : Fixe le tag de l'image (`postgres:17-alpine`, pas `postgres:latest`). La CI doit être reproductible. Un "latest" qui change sous toi, c'est un bug en embuscade.
+> ✅ **Bonne pratique** : Fixe le tag de l'image (`postgres:17-alpine`, pas `postgres:latest`). La reproductibilité est l'objectif même. Un `latest` non fixé qui se déplace sous toi invalide silencieusement tous les runs qui l'ont précédé.
 
 ## Zoom : un test qui utilise la fixture
 
@@ -151,11 +157,142 @@ Appelle `ResetDatabaseAsync` dans le constructeur du test ou dans un `IAsyncLife
 
 > ⚠️ **Ça marche, mais...** : Un provider in-memory comme `Microsoft.EntityFrameworkCore.InMemory` est tentant parce qu'il est rapide, mais il ignore silencieusement les foreign keys, les contraintes, et tout le comportement SQL-spécifique. C'est ok pour tester des services avec une logique EF triviale et dangereux pour tout ce qui touche à une vraie requête. Préfère un vrai container Postgres.
 
-> ❌ **Ne jamais faire** : Ne pointe pas tes tests d'intégration vers une base de dev partagée. Tu découvriras, dans la douleur, que deux devs qui lancent la suite en même temps corrompent l'état l'un de l'autre. TestContainers supprime l'excuse.
+> ❌ **Ne jamais faire** : Ne pointe pas tes tests d'intégration vers une base de dev partagée. Deux devs qui lancent la suite en parallèle corrompent l'état l'un de l'autre, et l'échec ressemble à un test flaky plutôt qu'à une contention sur une ressource commune. TestContainers supprime directement la cause.
+
+## Zoom : les scénarios que tu ne pouvais pas tester avant
+
+C'est là que TestContainers gagne sa place. Trois exemples concrets de choses qui étaient quasiment impossibles (ou qui te coûtaient une semaine de YAML) avant, et qui tiennent maintenant dans une fixture.
+
+### Comportement spécifique à Postgres : recherche floue avec pg_trgm
+
+Tu as un endpoint de recherche qui trouve des clients par nom approximatif avec l'extension `pg_trgm`. Aucun mock sur terre ne reproduit le ranking de `similarity()`. La seule façon de le tester, c'est contre un vrai Postgres.
+
+```csharp
+public sealed class SearchFixture : IAsyncLifetime
+{
+    public PostgreSqlContainer Postgres { get; } = new PostgreSqlBuilder()
+        .WithImage("postgres:17-alpine")
+        .WithDatabase("search_test")
+        .Build();
+
+    public async ValueTask InitializeAsync()
+    {
+        await Postgres.StartAsync();
+        await using var db = CreateDbContext();
+        await db.Database.MigrateAsync();
+        // Active l'extension, crée l'index GIN, seed les données de test.
+        await db.Database.ExecuteSqlRawAsync("CREATE EXTENSION IF NOT EXISTS pg_trgm");
+        await db.Database.ExecuteSqlRawAsync(
+            "CREATE INDEX idx_customers_name_trgm ON customers USING gin (name gin_trgm_ops)");
+        db.Customers.AddRange(
+            new Customer("Jean Dupont"),
+            new Customer("Jeanne Dupond"),
+            new Customer("John Doe"));
+        await db.SaveChangesAsync();
+    }
+
+    public ShopDbContext CreateDbContext() => new(new DbContextOptionsBuilder<ShopDbContext>()
+        .UseNpgsql(Postgres.GetConnectionString()).Options);
+
+    public ValueTask DisposeAsync() => Postgres.DisposeAsync();
+}
+
+[Fact]
+public async Task Search_renvoie_les_matches_flous_classes_par_similarite()
+{
+    await using var db = _fixture.CreateDbContext();
+    var repo = new CustomerRepository(db);
+
+    var hits = await repo.SearchAsync("Jen Dupon", limit: 5);
+
+    hits.Should().HaveCountGreaterThan(0);
+    hits[0].Name.Should().BeOneOf("Jean Dupont", "Jeanne Dupond");
+}
+```
+
+Le test prouve que l'extension est installée, que l'index est utilisé, et que le SQL que tu as écrit classe les résultats comme un vrai utilisateur l'attend. Un mock du repository ne validerait rien de tout cela, parce que le comportement sous test vit à l'intérieur de Postgres, pas dans ton code C#.
+
+### Keycloak avec un vrai realm, utilisateurs, rôles et clients
+
+L'autorisation par rôle, c'est notoirement pénible à tester. "Est-ce que `/admin/users` refuse un non-admin ?" demandait autrefois un Keycloak partagé, un realm curé à la main, et une convention que personne ne documentait. Avec TestContainers, tu importes un JSON de realm au démarrage du container, et tu obtiens tout : utilisateurs, mots de passe, rôles, clients, client scopes, mappers.
+
+```csharp
+public sealed class KeycloakFixture : IAsyncLifetime
+{
+    public IContainer Keycloak { get; } = new ContainerBuilder()
+        .WithImage("quay.io/keycloak/keycloak:26.0")
+        .WithPortBinding(8080, true)
+        .WithEnvironment("KC_BOOTSTRAP_ADMIN_USERNAME", "admin")
+        .WithEnvironment("KC_BOOTSTRAP_ADMIN_PASSWORD", "admin")
+        .WithResourceMapping(
+            new FileInfo("test-realm.json"),
+            "/opt/keycloak/data/import/test-realm.json")
+        .WithCommand("start-dev", "--import-realm")
+        .WithWaitStrategy(Wait.ForUnixContainer()
+            .UntilHttpRequestIsSucceeded(r => r.ForPath("/realms/test").ForPort(8080)))
+        .Build();
+
+    public string BaseUrl =>
+        $"http://{Keycloak.Hostname}:{Keycloak.GetMappedPublicPort(8080)}";
+
+    public ValueTask InitializeAsync() => new(Keycloak.StartAsync());
+    public ValueTask DisposeAsync() => Keycloak.DisposeAsync();
+}
+```
+
+`test-realm.json` vit à côté de la fixture. Il contient `alice` (rôle `admin`), `bob` (rôle `user`), un client confidentiel, des scopes, tout ce que ton realm de prod a, figé comme donnée de test. Chaque run obtient un Keycloak propre avec exactement le même état.
+
+```csharp
+[Fact]
+public async Task Endpoint_admin_refuse_un_utilisateur_non_admin()
+{
+    var token = await GetTokenAsync("bob", "bob-password"); // utilisateur simple
+    _client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+
+    var response = await _client.GetAsync("/admin/users");
+
+    response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+}
+```
+
+Le test passe par un vrai Keycloak, un vrai JWT, le vrai pipeline d'autorisation ASP.NET Core, contre la vraie policy. Rien n'est mocké. Quand ton mapping de rôles change en prod, ce test te le dit avant le deploy.
+
+### MinIO pour du stockage compatible S3
+
+Ton code utilise `AmazonS3Client` pour uploader des factures, générer des URLs présignées, et poser des policies de bucket. Tu veux vérifier que l'URL présignée télécharge vraiment le fichier, et qu'elle expire quand elle doit.
+
+```csharp
+public sealed class MinioFixture : IAsyncLifetime
+{
+    public IContainer Minio { get; } = new ContainerBuilder()
+        .WithImage("minio/minio:latest")
+        .WithPortBinding(9000, true)
+        .WithEnvironment("MINIO_ROOT_USER", "minioadmin")
+        .WithEnvironment("MINIO_ROOT_PASSWORD", "minioadmin")
+        .WithCommand("server", "/data")
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(9000))
+        .Build();
+
+    public AmazonS3Client CreateClient() => new(
+        new BasicAWSCredentials("minioadmin", "minioadmin"),
+        new AmazonS3Config
+        {
+            ServiceURL = $"http://{Minio.Hostname}:{Minio.GetMappedPublicPort(9000)}",
+            ForcePathStyle = true,
+        });
+
+    public ValueTask InitializeAsync() => new(Minio.StartAsync());
+    public ValueTask DisposeAsync() => Minio.DisposeAsync();
+}
+```
+
+À partir de là, tu testes de vrais uploads multipart, de vraies URLs présignées, un vrai comportement d'expiration. Le même code client tourne en prod contre AWS S3, et en test contre MinIO, parce que les deux parlent le protocole S3.
+
+> 💡 **Info** : Le pattern se généralise. Si un outil a une image Docker officielle, tu peux le piloter depuis une fixture : RabbitMQ, Kafka, Mongo, Elasticsearch, Vault, Mailhog. Les packages NuGet `Testcontainers.*` fournissent des builders pré-construits pour les plus courants, et `ContainerBuilder` s'occupe du reste.
 
 ## Zoom : composer plusieurs services
 
-Les vraies applis ont besoin de plus qu'une base. Redis pour le cache, RabbitMQ pour les messages, MinIO pour du stockage compatible S3. TestContainers compose tout ça dans la même fixture :
+Les vraies applis ont besoin de plus d'une dépendance. Postgres + Keycloak + MinIO + Redis, c'est une forme classique. Compose-les dans une seule fixture et démarre-les en parallèle :
 
 ```csharp
 public sealed class AppServicesFixture : IAsyncLifetime
