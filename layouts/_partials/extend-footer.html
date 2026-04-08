@@ -1,4 +1,31 @@
 <style>
+  /* Widen article body so code blocks are not cramped.
+     Keeps prose readable (~80ch) and lets <pre> break out wider on large screens. */
+  article .max-w-prose,
+  article.max-w-prose,
+  main .max-w-prose {
+    max-width: 80ch;
+  }
+  @media (min-width: 1280px) {
+    article .prose pre,
+    article .prose .highlight,
+    main .prose pre,
+    main .prose .highlight {
+      max-width: none;
+      width: calc(100% + 8rem);
+      margin-left: -4rem;
+      margin-right: -4rem;
+    }
+  }
+  .prose pre {
+    white-space: pre;
+    overflow-x: auto;
+  }
+  .prose pre code {
+    white-space: pre;
+    word-break: normal;
+  }
+
   .mermaid {
     cursor: zoom-in;
     overflow-x: auto;
