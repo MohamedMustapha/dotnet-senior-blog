@@ -12,9 +12,17 @@ showPagination: false
 
 Je suis Mohamed Mustapha, Architecte Logiciel et Tech Lead .NET à la Direction Générale du Trésor, au sein du Ministère de l'Economie, où je pilote la modernisation de 35 applications administratives : authentification, infrastructure, observabilité.
 
-J'ai passé des années à faire ce que la plupart des tutoriels évitent : migrer des applications WS-Federation legacy vers Keycloak sans les réécrire, construire du tracing distribué from scratch sur des clusters IIS, concevoir des monolithes modulaires que les équipes peuvent réellement maintenir, et expliquer à des directions non-techniques pourquoi les décisions d'architecture ont des conséquences concrètes.
+### 17 ans, un pied dans le passé, un pied dans le futur
 
-Ce blog est la version écrite de ce que j'enseigne.
+J'ai commencé ma carrière sur SharePoint et .NET Framework Web Forms. Pendant que beaucoup de devs tournaient la page, mon métier m'a obligé à continuer de maintenir ces applications en parallèle de stacks plus récentes. Avec le recul, ce double tracé est ce qui m'a apporté le plus dans toute ma carrière.
+
+Pendant 17 ans, j'ai gardé un pied solidement ancré dans le "passé extrême" (Web Forms, WCF, IIS, l'authentification à l'ancienne) et l'autre pied en mouvement à chaque évolution .NET : ASP.NET MVC, les middlewares OWIN, .NET Core, le software craftsmanship, le N-Couches, la Clean Architecture, CQRS, le Vertical Slicing, les microservices, les monolithes modulaires, les containers, Kubernetes, l'observabilité, .NET Aspire.
+
+Tenir les deux bouts en même temps m'a obligé à comprendre **chaque** changement en profondeur. Pas juste "le nouveau truc à la mode", mais *pourquoi* chaque virage a eu lieu, *quel problème* il réglait vraiment, et *quel compromis* il introduisait en échange. Et comme je forme des développeurs en parallèle de mon travail de delivery depuis des années, j'ai dû garder une carte mentale vivante de toute cette évolution, pour pouvoir l'expliquer à quelqu'un qui débarque en plein milieu.
+
+Ce blog, c'est cette carte mentale, mise à l'écrit.
+
+J'ai passé des années à faire ce que la plupart des tutoriels évitent : migrer des applications WS-Federation legacy vers Keycloak sans les réécrire, construire du tracing distribué from scratch sur des clusters IIS, concevoir des monolithes modulaires que les équipes peuvent réellement maintenir, et expliquer à des directions non-techniques pourquoi les décisions d'architecture ont des conséquences concrètes.
 
 ---
 
