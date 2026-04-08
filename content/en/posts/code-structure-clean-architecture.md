@@ -28,14 +28,14 @@ The payoff is not theoretical. It is the ability to upgrade EF Core, change mess
 
 Before the code, here are the bricks of Clean Architecture as we will use them in .NET:
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Api / Presentation<br/>Controllers, Minimal APIs, SignalR] --> B[Application<br/>Use cases, commands, queries, ports]
     B --> C[Domain<br/>Entities, value objects, domain services, invariants]
     D[Infrastructure<br/>EF Core, HTTP clients, file system, message bus] --> B
     D --> C
     A --> D
-```
+{{< /mermaid >}}
 
 The arrows are the only thing that matters. **Everything points toward Domain.** Domain depends on nothing. Application depends only on Domain. Infrastructure implements interfaces declared in Application (or Domain). The Api project wires everything up at startup. If you get the arrows right, you have Clean Architecture. If you do not, you have four projects that share the cost of the split without sharing the benefit.
 

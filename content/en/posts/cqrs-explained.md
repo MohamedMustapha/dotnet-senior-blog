@@ -43,7 +43,7 @@ Here are the moving parts of a CQRS-style application:
 - **Handlers**: one handler per command or query. Single responsibility.
 - **Dispatcher**: routes a command or query to its handler. Can be MediatR, or a hand-rolled dispatcher, or nothing at all.
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     Client([Client]) --> API[ASP.NET Core API]
     API -->|Command| CBus[Command Dispatcher]
@@ -53,7 +53,7 @@ flowchart LR
     QBus --> QH[GetOrderByIdHandler]
     QH --> ReadDB[(Read Model)]
     WriteDB -.optional sync.-> ReadDB
-```
+{{< /mermaid >}}
 
 > 💡 **Info** : The dashed arrow is optional. CQRS does not require two databases. A single EF Core `DbContext` hitting the same SQL Server is perfectly valid CQRS.
 

@@ -28,7 +28,7 @@ Trois dossiers. Trois suffixes. Fini. C'est ça le deal : juste assez de structu
 
 Avant de rentrer dans le code, voici les grandes briques de ce découpage :
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Controllers / Endpoints<br/>Couche HTTP] --> B[Services<br/>Logique métier]
     B --> C[Repositories<br/>Accès aux données]
@@ -36,7 +36,7 @@ graph TD
     A -.->|DTOs| E[Models / Contrats]
     B -.->|Entités + DTOs| E
     C -.->|Entités| E
-```
+{{< /mermaid >}}
 
 | Dossier | Rôle | Fichiers typiques |
 |---|---|---|

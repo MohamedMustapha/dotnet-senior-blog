@@ -30,7 +30,7 @@ Le Vertical Slicing inverse le défaut :
 
 Avant de rentrer dans le code, voici comment une tranche verticale s'installe dans un projet .NET :
 
-```mermaid
+{{< mermaid >}}
 graph TD
     subgraph "Features/Orders/SubmitOrder"
         A[SubmitOrderEndpoint.cs]
@@ -52,7 +52,7 @@ graph TD
     C --> J
     H --> J
     C --> K
-```
+{{< /mermaid >}}
 
 Deux fonctionnalités, deux dossiers, tout ce qu'il faut pour livrer une feature au même endroit. Le seul code partagé, c'est le `DbContext` et les entités de domaine, et c'est fait exprès.
 

@@ -43,7 +43,7 @@ Avant de rentrer dans le code, voici les grandes briques de CQRS :
 - **Handlers** : un handler par commande ou query. Responsabilité unique.
 - **Dispatcher** : route une commande ou une query vers son handler. Ça peut être MediatR, un dispatcher maison, ou rien du tout.
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     Client([Client]) --> API[API ASP.NET Core]
     API -->|Command| CBus[Command Dispatcher]
@@ -53,7 +53,7 @@ flowchart LR
     QBus --> QH[GetOrderByIdHandler]
     QH --> ReadDB[(Modèle de lecture)]
     WriteDB -.sync optionnelle.-> ReadDB
-```
+{{< /mermaid >}}
 
 > 💡 **Info** : La flèche en pointillés est optionnelle. CQRS n'impose pas deux bases. Un seul `DbContext` EF Core qui tape sur le même SQL Server, c'est du CQRS tout à fait valide.
 

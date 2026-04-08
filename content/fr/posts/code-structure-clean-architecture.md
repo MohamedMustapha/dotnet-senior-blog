@@ -30,14 +30,14 @@ Le gain n'est pas théorique. C'est la possibilité de monter EF Core de version
 
 Avant de rentrer dans le code, voici les grandes briques de la Clean Architecture telles qu'on va les utiliser en .NET :
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Api / Presentation<br/>Controllers, Minimal APIs, SignalR] --> B[Application<br/>Use cases, commandes, queries, ports]
     B --> C[Domain<br/>Entités, value objects, services de domaine, invariants]
     D[Infrastructure<br/>EF Core, clients HTTP, fichiers, bus de messages] --> B
     D --> C
     A --> D
-```
+{{< /mermaid >}}
 
 Les flèches, c'est la seule chose qui compte. **Tout pointe vers Domain.** Domain ne dépend de rien. Application ne dépend que de Domain. Infrastructure implémente les interfaces déclarées dans Application (ou dans Domain). Le projet Api fait le câblage au démarrage. Si les flèches sont bonnes, tu as de la Clean Architecture. Sinon, tu as quatre projets qui te coûtent le découpage sans te rendre le bénéfice.
 

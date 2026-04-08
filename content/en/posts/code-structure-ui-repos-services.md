@@ -24,7 +24,7 @@ Three folders. Three suffixes. Done. That is the whole pitch: just enough struct
 
 ## Overview: the three buckets
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Controllers / Endpoints<br/>HTTP layer] --> B[Services<br/>Business logic]
     B --> C[Repositories<br/>Data access]
@@ -32,7 +32,7 @@ graph TD
     A -.->|DTOs| E[Models / Contracts]
     B -.->|Entities + DTOs| E
     C -.->|Entities| E
-```
+{{< /mermaid >}}
 
 | Folder | Role | Typical files |
 |---|---|---|

@@ -29,7 +29,7 @@ It gives you:
 
 ## Overview: the layers
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Presentation Layer<br/>Controllers / Minimal API] --> B[Service Layer<br/>Business Logic]
     B --> C[Repository Layer<br/>Data Access]
@@ -37,7 +37,7 @@ graph TD
     E[Domain / Models<br/>Entities + DTOs] -.-> A
     E -.-> B
     E -.-> C
-```
+{{< /mermaid >}}
 
 | Layer | Responsibility | Typical contents |
 |---|---|---|
@@ -83,7 +83,7 @@ Returning EF Core entities directly from your controllers feels like a shortcut.
 
 The fix is boring and effective: accept a request DTO, map it to an entity inside the service, persist, then map the result back to a response DTO.
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     Client([HTTP Client]) -->|POST /orders| Req[CreateOrderRequest<br/>DTO]
     Req --> Ctrl[Controller]
@@ -111,7 +111,7 @@ flowchart LR
     style Res fill:#d4f1d4,stroke:#2a7a2a
     style Ent fill:#f1d4d4,stroke:#7a2a2a
     style Ent2 fill:#f1d4d4,stroke:#7a2a2a
-```
+{{< /mermaid >}}
 
 Explicit mapping, no AutoMapper, no reflection magic:
 

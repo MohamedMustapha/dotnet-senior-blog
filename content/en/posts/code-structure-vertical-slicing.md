@@ -28,7 +28,7 @@ Vertical Slicing flips the default:
 
 Before the code, here is how a vertical slice sits in a .NET project:
 
-```mermaid
+{{< mermaid >}}
 graph TD
     subgraph "Features/Orders/SubmitOrder"
         A[SubmitOrderEndpoint.cs]
@@ -50,7 +50,7 @@ graph TD
     C --> J
     H --> J
     C --> K
-```
+{{< /mermaid >}}
 
 Two features, two folders, everything you need to ship one feature in one place. The only shared code is the `DbContext` and the domain entities, and that is on purpose.
 

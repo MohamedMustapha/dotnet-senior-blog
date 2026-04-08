@@ -33,7 +33,7 @@ Ce que ça t'apporte :
 
 Avant de rentrer dans le code, voici les grandes briques de l'architecture N-Couches :
 
-```mermaid
+{{< mermaid >}}
 graph TD
     A[Couche Présentation<br/>Controllers / Minimal API] --> B[Couche Service<br/>Logique Métier]
     B --> C[Couche Repository<br/>Accès aux Données]
@@ -41,7 +41,7 @@ graph TD
     E[Domain / Models<br/>Entités + DTOs] -.-> A
     E -.-> B
     E -.-> C
-```
+{{< /mermaid >}}
 
 | Couche | Responsabilité | Contenu typique |
 |---|---|---|
@@ -87,7 +87,7 @@ Renvoyer directement des entités EF Core depuis tes contrôleurs ressemble à u
 
 La solution est ennuyeuse et terriblement efficace : accepter un DTO de requête, le mapper vers une entité dans le service, persister, puis remapper le résultat vers un DTO de réponse.
 
-```mermaid
+{{< mermaid >}}
 flowchart LR
     Client([Client HTTP]) -->|POST /orders| Req[CreateOrderRequest<br/>DTO]
     Req --> Ctrl[Controller]
@@ -115,7 +115,7 @@ flowchart LR
     style Res fill:#d4f1d4,stroke:#2a7a2a
     style Ent fill:#f1d4d4,stroke:#7a2a2a
     style Ent2 fill:#f1d4d4,stroke:#7a2a2a
-```
+{{< /mermaid >}}
 
 Mapping explicite, sans AutoMapper, sans magie de réflexion :
 
