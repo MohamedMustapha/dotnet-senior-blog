@@ -14,15 +14,37 @@ The .NET unit testing story is mature. xUnit.net was started by James Newkirk in
 
 ## Why unit tests exist
 
-Picture a team shipping a pricing engine. Rules pile up: regional taxes, volume discounts, loyalty multipliers, promotional overrides. After six months, nobody dares touch `PriceCalculator.Calculate()` because one wrong line could silently overcharge thousands of customers. Every change goes through a three-day manual QA pass. Delivery velocity drops measurably.
+Unit tests solve four concrete problems that no other layer of the test pyramid addresses as efficiently.
 
-What the team actually needs:
+**1. They protect against regression over time.** This is the primary reason they exist. A team ships a pricing engine in month one. In month two, a volume discount tier is added. In month four, a loyalty multiplier interacts with it. In month nine, a new joiner refactors a helper and unknowingly breaks the interaction between tiers and loyalty. Without unit tests, that regression reaches production, and the team discovers it from a customer complaint. With unit tests, the change never merges: the test that pinned the month-two behavior fails in under a second, on the laptop of the person who made the change.
 
-1. **Fast feedback**: a green bar in under a second when the logic is right.
-2. **Targeted regression**: when a change breaks rule #7 specifically, the failing test tells you which rule and which input.
-3. **Refactor confidence**: ability to restructure the calculator internally without rewriting the test suite.
+**2. They detect god classes and god methods early.** A method that is hard to unit-test is almost never a testing problem, it is a design problem. When a single test requires fifteen mocks, four pages of arrange code, and a dozen assertions to cover one call, the test is telling you that the method under test is doing too many things at once. The correct response is not to write the giant test. It is to split the method. Unit tests act as an early warning system for god classes and god methods, long before they show up in a code-quality report.
 
-Unit tests deliver all three, but only if they are scoped correctly. The moment a "unit test" spins up a database, a web host, or the file system, it stops being a unit test and starts being a slow integration test. That is a different tool with a different job.
+**3. They test the logic of methods, and nothing else.** Unit tests are the right tool when the question is "does this piece of logic compute the right result for a given input". Database queries, HTTP pipelines, middleware, serialization, authentication: those are not logic of a method, they are behaviors of infrastructure. They belong in integration tests, API tests, or E2E tests, not here. Keeping the scope to pure logic is what makes unit tests fast, stable, and trustworthy.
+
+**4. Cherry on top for domain-driven designs.** When the business logic lives inside a well-designed, non-anemic aggregate (that is, an entity that enforces its own invariants instead of exposing public setters for a service to manipulate), unit tests become exceptionally clean. The aggregate contains the rules, the tests contain the scenarios, and there is nothing else to wire up. This is the strongest argument for keeping logic inside the domain instead of scattering it across services, mappers, and validators. A dedicated article on DDD and aggregates will go deeper into this point.
+
+## What should be tested
+
+A reasonable default for every method that contains real logic: **the happy path, the edge cases, and the failure cases**. Those three categories cover almost every bug worth catching.
+
+- **Happy path**: the normal, successful execution with valid inputs. One test per method, minimum.
+- **Edge cases**: boundaries where behavior flips. Quantity of 0, 1, exactly the discount threshold, an empty collection, a null optional field, the maximum allowed value, the first day of a month, a leap year.
+- **Failure cases**: what happens when an invariant is violated. A negative quantity, an already-submitted order being submitted again, a refund that exceeds the original amount. The test asserts that the right exception (or `Result.Failure`) comes back, not a half-corrupted state.
+
+On top of that baseline, two more rules earn their place in any serious team.
+
+**Every production bug should add one test.** When a bug is found in production, the fix is incomplete until a test exists that would have caught it. This is the only durable way to make regression protection accumulate. A test suite that grows one test per incident becomes, over years, a map of everything that has ever gone wrong, and the team inherits that knowledge for free.
+
+**Guard rails and authorization deserve their own tests.** Defensive programming is not complete until it is verified. For every role-sensitive operation, write the pair: "as an admin, the action is allowed" and "as a regular user, the action is denied". Same for tenant isolation, ownership checks, and rate limits. These are the rules that get silently broken during a refactor and discovered during an audit.
+
+**For CRUD-heavy applications**, the same categorization still applies, but the focus shifts:
+
+- **Write operations** with business logic: validation rules, cross-field invariants, state transitions. Test these at the unit level, with the aggregate or service as the SUT.
+- **Read operations** with transforms: projection from entity to DTO, aggregation, computed fields, formatting. Test the transformation itself.
+- **Pure pass-through CRUD** (controller to repository to database, no logic in between) does not need a unit test. It needs an integration test that proves the round trip works.
+
+Unit tests deliver all of the above, but only if they stay scoped correctly. The moment a "unit test" spins up a database, a web host, or the file system, it stops being a unit test and becomes a slow integration test. That is a different tool, with a different job.
 
 ## Overview: the pieces
 
