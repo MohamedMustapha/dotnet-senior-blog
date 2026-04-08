@@ -286,7 +286,7 @@ series:
         title_fr: "Zero Allocation en .NET"
         slug: "zero-allocation"
         tags: ["performance", "dotnet", "memory"]
-        status: "todo"
+        status: "done"
 
       - title_en: "AOT Compilation in .NET"
         title_fr: "Compilation AOT en .NET"
