@@ -340,7 +340,7 @@ series:
         title_fr: "Le Baseline Testing"
         slug: "load-testing-baseline"
         tags: ["load-testing", "baseline", "performance"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Soak Testing"
         title_fr: "Le Soak Testing"
