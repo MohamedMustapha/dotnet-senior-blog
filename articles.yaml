@@ -217,7 +217,7 @@ series:
         title_fr: "Hébergement sur IIS : le classique"
         slug: "hosting-iis"
         tags: ["hosting", "iis", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Hosting with Docker"
         title_fr: "Hébergement avec Docker"
