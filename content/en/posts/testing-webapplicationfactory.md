@@ -45,6 +45,21 @@ The factory boots your `Program.cs` with a `TestServer` instead of Kestrel. The 
 
 > 💡 **Info** : `WebApplicationFactory<TEntryPoint>` uses a type argument that points at any type in your startup assembly. The convention is `WebApplicationFactory<Program>`. If you use top-level statements, you need to add `public partial class Program { }` at the bottom of `Program.cs` so the test project can reference the type.
 
+### The invisible HTTP pipeline you are actually testing
+
+When an endpoint is declared as a minimal API or a controller action, ASP.NET Core does a surprising amount of work between "an HTTP request arrived" and "your handler runs with C# arguments". Most of that work is invisible in the source code, which is exactly why bugs hide there. A real `WebApplicationFactory` test exercises all of it at once:
+
+- **Route matching and constraints**: `{id:guid}` rejects a non-GUID and returns 404 before the handler ever runs.
+- **Model binding from the query string**: `?status=active&page=2` is parsed into typed parameters, including nullable types, enums, and arrays.
+- **Model binding from the body**: the JSON body is deserialized into a DTO via `System.Text.Json`, applying any custom converters, naming policies, or numeric formats configured in `JsonSerializerOptions`.
+- **Header binding**: `[FromHeader]` parameters, `Accept` negotiation, `If-None-Match`, `Authorization` all feed the pipeline.
+- **Form binding and file uploads**: `multipart/form-data` is split into fields and `IFormFile` instances.
+- **Model validation**: data annotations and `IValidatableObject` fire, and validation failures return a `ValidationProblemDetails` response without the handler being called.
+- **Content negotiation and output serialization**: the C# return value is converted back to JSON, Problem Details, or any other registered formatter, with the right `Content-Type` and `charset`.
+- **Status code selection**: `Results.Ok(...)`, `Results.NotFound()`, `TypedResults.NoContent()`, and unhandled exceptions are translated into proper HTTP status codes.
+
+None of this is written in your endpoint file. All of it runs for real in a `WebApplicationFactory` test. When a test fails because a query string parameter did not bind, a JSON property was renamed by a naming policy, a date format changed, or a validator now rejects a previously-valid payload, the failure is telling you something the source code alone cannot: the contract between HTTP and C# has shifted. That is exactly the category of bugs unit tests cannot catch, and it is the reason `WebApplicationFactory` earns its place in the pyramid.
+
 ## Zoom: the minimum test
 
 ```csharp

@@ -43,9 +43,24 @@ graph TD
     D --> F[(Postgres depuis TestContainers)]
 {{< /mermaid >}}
 
-La factory boot ton `Program.cs` avec un `TestServer` au lieu de Kestrel. Le `HttpClient` qu'elle te refile parle au pipeline directement, en court-circuitant le réseau. Tout ce qui compte (routing, filters, auth, sérialisation) tourne pour de vrai.
+La factory démarre le `Program.cs` avec un `TestServer` au lieu de Kestrel. Le `HttpClient` qu'elle rend parle au pipeline directement, en court-circuitant le réseau. Tout ce qui compte (routing, filters, auth, sérialisation) tourne pour de vrai.
 
-> 💡 **Info** : `WebApplicationFactory<TEntryPoint>` prend un argument générique qui pointe vers un type de ton assembly de démarrage. La convention, c'est `WebApplicationFactory<Program>`. Si tu utilises les top-level statements, il faut ajouter `public partial class Program { }` en bas de ton `Program.cs` pour que le projet de test puisse référencer le type.
+> 💡 **Info** : `WebApplicationFactory<TEntryPoint>` prend un argument générique qui pointe vers un type de l'assembly de démarrage. La convention est `WebApplicationFactory<Program>`. Avec les top-level statements, il faut ajouter `public partial class Program { }` en bas du `Program.cs` pour que le projet de test puisse référencer le type.
+
+### Le pipeline HTTP invisible que l'on teste vraiment
+
+Quand un endpoint est déclaré en minimal API ou en action de controller, ASP.NET Core effectue une quantité surprenante de travail entre "une requête HTTP est arrivée" et "le handler tourne avec ses arguments C#". La plupart de ce travail est invisible dans le code source, et c'est précisément pour ça que les bugs s'y cachent. Un vrai test `WebApplicationFactory` exerce tout cela en même temps :
+
+- **Matching de route et contraintes** : `{id:guid}` rejette un non-GUID et renvoie 404 avant même que le handler ne soit appelé.
+- **Model binding depuis la query string** : `?status=active&page=2` est parsé en paramètres typés, y compris les types nullables, les enums et les tableaux.
+- **Model binding depuis le body** : le body JSON est désérialisé en DTO via `System.Text.Json`, en appliquant les converters custom, les naming policies et les formats numériques configurés dans `JsonSerializerOptions`.
+- **Binding des headers** : les paramètres `[FromHeader]`, la négociation `Accept`, `If-None-Match`, `Authorization`, tout cela alimente le pipeline.
+- **Binding de formulaire et upload de fichiers** : le `multipart/form-data` est découpé en champs et en instances de `IFormFile`.
+- **Validation du modèle** : les data annotations et `IValidatableObject` se déclenchent, et un échec de validation renvoie une réponse `ValidationProblemDetails` sans que le handler ne soit appelé.
+- **Négociation de contenu et sérialisation de sortie** : la valeur de retour C# est reconvertie en JSON, Problem Details, ou tout autre formatter enregistré, avec le bon `Content-Type` et le bon `charset`.
+- **Sélection du status code** : `Results.Ok(...)`, `Results.NotFound()`, `TypedResults.NoContent()`, et les exceptions non gérées sont traduites en status codes HTTP corrects.
+
+Rien de tout cela n'est écrit dans le fichier de l'endpoint. Tout cela tourne pour de vrai dans un test `WebApplicationFactory`. Quand un test échoue parce qu'un paramètre de query string ne bind plus, qu'une propriété JSON a été renommée par une naming policy, qu'un format de date a changé, ou qu'un validator rejette un payload auparavant valide, l'échec signale quelque chose que le code source seul ne peut pas dire : le contrat entre HTTP et C# a bougé. C'est exactement la catégorie de bugs que les tests unitaires ne peuvent pas attraper, et c'est la raison pour laquelle `WebApplicationFactory` mérite sa place dans la pyramide.
 
 ## Zoom : le test minimum
 
