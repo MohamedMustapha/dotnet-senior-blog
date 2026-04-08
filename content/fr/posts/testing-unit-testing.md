@@ -28,9 +28,9 @@ Les tests unitaires répondent à quatre problèmes concrets qu'aucune autre cou
 
 ## Que faut-il tester
 
-Un défaut raisonnable pour toute méthode qui contient de la vraie logique : **le chemin passant, les cas limites, et les cas d'échec**. Ces trois catégories couvrent la quasi-totalité des bugs qui valent la peine d'être attrapés.
+Un défaut raisonnable pour toute méthode qui contient de la vraie logique : **le cas nominal (happy path), les cas limites, et les cas d'échec**. Ces trois catégories couvrent la quasi-totalité des bugs qui valent la peine d'être attrapés.
 
-- **Le chemin passant** : l'exécution normale et réussie avec des inputs valides. Un test par méthode, minimum.
+- **Le cas nominal** (aussi appelé *happy path*) : l'exécution normale et réussie avec des inputs valides. Un test par méthode, minimum.
 - **Les cas limites** : les frontières où le comportement bascule. Une quantité de 0, de 1, exactement le seuil de remise, une collection vide, un champ optionnel null, la valeur maximale autorisée, le premier jour d'un mois, une année bissextile.
 - **Les cas d'échec** : ce qui se passe quand un invariant est violé. Une quantité négative, une commande déjà soumise qu'on tente de soumettre à nouveau, un remboursement qui dépasse le montant initial. Le test vérifie que la bonne exception (ou le bon `Result.Failure`) revient, pas un état à moitié corrompu.
 
