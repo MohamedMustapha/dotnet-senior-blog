@@ -307,7 +307,7 @@ series:
         title_fr: "Tests d'Intégration avec TestContainers"
         slug: "integration-testing-testcontainers"
         tags: ["testing", "integration", "testcontainers", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "API Testing with WebApplicationFactory"
         title_fr: "Tests API avec WebApplicationFactory"
