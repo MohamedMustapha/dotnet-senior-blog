@@ -1,6 +1,7 @@
 baseURL = "https://your-blog.pages.dev/"
 defaultContentLanguage = "en"
 defaultContentLanguageInSubdir = false
+theme = "congo"
 
 [languages]
   [languages.en]
