@@ -241,7 +241,7 @@ series:
         title_fr: "Azure Web App"
         slug: "azure-web-app"
         tags: ["hosting", "azure", "dotnet"]
-        status: "todo"
+        status: "done"
 
   - name: "C# Improvements"
     slug: "csharp-improvements"
