@@ -1,0 +1,28 @@
+baseURL = "https://your-blog.pages.dev/"
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = false
+
+[languages]
+  [languages.en]
+    languageName = "English"
+    weight = 1
+    title = ".NET Senior Path"
+    [languages.en.params]
+      description = "Level up from mid to senior .NET developer"
+
+  [languages.fr]
+    languageName = "Français"
+    weight = 2
+    title = ".NET Senior Path"
+    contentDir = "content/fr"
+    [languages.fr.params]
+      description = "Progressez vers le niveau senior en .NET"
+
+[params]
+  colorScheme = "dark"
+  showAuthor = true
+
+[markup]
+  [markup.highlight]
+    style = "dracula"
+    lineNos = true
