@@ -25,7 +25,7 @@ series:
         title_fr: "Découpage Vertical"
         slug: "vertical-slicing"
         tags: ["architecture", "dotnet", "vertical-slicing"]
-        status: "todo"
+        status: "done"
 
   - name: "Code Architecture"
     slug: "code-architecture"
