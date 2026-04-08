@@ -24,9 +24,42 @@ Vertical Slicing flips the default:
 2. **Cross-feature reuse is the exception**, not the rule. Duplication is acceptable when it isolates changes.
 3. **Abstractions emerge from patterns**, not from preemptive interface gardening.
 
-## Overview: the shape of a slice
+## Overview: concerns vs features, side by side
 
-Before the code, here is how a vertical slice sits in a .NET project:
+The fastest way to see what Vertical Slicing really changes is to compare the two mental models on the same feature set. Same three features, same three technical concerns, two completely different ways to lay them out on disk:
+
+{{< mermaid >}}
+graph LR
+    subgraph H["Horizontal slicing : by concern"]
+        direction TB
+        HC[Controllers]
+        HS[Services]
+        HR[Repositories]
+        HC --> HS
+        HS --> HR
+    end
+    subgraph V["Vertical slicing : by feature"]
+        direction TB
+        subgraph S1[SubmitOrder]
+            direction TB
+            A1[Endpoint] --> A2[Handler] --> A3[DB]
+        end
+        subgraph S2[RefundOrder]
+            direction TB
+            B1[Endpoint] --> B2[Handler] --> B3[DB]
+        end
+        subgraph S3[ExportInvoices]
+            direction TB
+            C1[Endpoint] --> C2[Handler] --> C3[DB]
+        end
+    end
+{{< /mermaid >}}
+
+On the left, every feature has to cross three shared layers, so every sprint pulls multiple developers into the same `Controllers/`, `Services/`, and `Repositories/` folders. On the right, each feature is a self-contained column: shipping `RefundOrder` never makes you open `SubmitOrder`. The technical concerns are still there, they just live **inside** the feature instead of being spread across the project.
+
+### The shape of a slice
+
+Before the code, here is how a single vertical slice sits in a .NET project:
 
 {{< mermaid >}}
 graph TD
