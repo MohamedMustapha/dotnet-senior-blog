@@ -223,7 +223,7 @@ series:
         title_fr: "Hébergement avec Docker"
         slug: "hosting-docker"
         tags: ["hosting", "docker", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Hosting on Kubernetes"
         title_fr: "Hébergement sur Kubernetes"
