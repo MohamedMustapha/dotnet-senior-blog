@@ -334,7 +334,7 @@ series:
         title_fr: "Les Types de Tests de Charge : vue d'ensemble"
         slug: "load-testing-overview"
         tags: ["load-testing", "performance", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Baseline Testing"
         title_fr: "Le Baseline Testing"
