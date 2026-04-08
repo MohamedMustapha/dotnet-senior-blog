@@ -235,7 +235,7 @@ series:
         title_fr: "Azure Container Apps"
         slug: "azure-container-apps"
         tags: ["hosting", "azure", "containers", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Azure Web App"
         title_fr: "Azure Web App"
