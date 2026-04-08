@@ -8,21 +8,21 @@ showWordCount: false
 showPagination: false
 ---
 
-## Je forme les développeurs .NET à penser comme des seniors.
+## 15 ans et plus à construire et enseigner .NET.
 
-Je suis Mohamed Mustapha, Architecte Logiciel et Tech Lead .NET à la Direction Générale du Trésor, au sein du Ministère de l'Economie, où je pilote la modernisation de 35 applications administratives : authentification, infrastructure, observabilité.
+Je suis Mohamed Mustapha, ingénieur fullstack et formateur. Après quinze ans et plus dans le métier, ma stack aujourd'hui est claire : **.NET (Core et suite) côté back, Angular côté front**. SharePoint et .NET Framework Web Forms ont fait partie de mes débuts, mais j'ai tourné cette page depuis un bon moment, et je livre du .NET moderne et de l'Angular depuis.
 
-### 17 ans, un pied dans le passé, un pied dans le futur
+### Là où j'ai construit
 
-J'ai commencé ma carrière sur SharePoint et .NET Framework Web Forms. Pendant que beaucoup de devs tournaient la page, mon métier m'a obligé à continuer de maintenir ces applications en parallèle de stacks plus récentes. Avec le recul, ce double tracé est ce qui m'a apporté le plus dans toute ma carrière.
+Au fil des années, j'ai travaillé chez **Microsoft France**, et livré pour des clients comme **Natixis**, **Banques Populaires**, **Rexel** et **Thales**. Banque, distribution d'énergie, défense, IT d'entreprise : chacun de ces environnements t'apprend quelque chose de différent sur ce que "la prod" veut vraiment dire, sur la façon dont les décisions d'architecture survivent au contact du réel, et sur comment garder un codebase en bonne santé pendant que les équipes changent. Aujourd'hui, je travaille à la Direction Générale du Trésor (Ministère de l'Économie) sur la modernisation d'applications administratives, mais la partie la plus importante de mon parcours, ce n'est aucun titre en particulier, c'est l'accumulation de contextes.
 
-Pendant 17 ans, j'ai gardé un pied solidement ancré dans le "passé extrême" (Web Forms, WCF, IIS, l'authentification à l'ancienne) et l'autre pied en mouvement à chaque évolution .NET : ASP.NET MVC, les middlewares OWIN, .NET Core, le software craftsmanship, le N-Couches, la Clean Architecture, CQRS, le Vertical Slicing, les microservices, les monolithes modulaires, les containers, Kubernetes, l'observabilité, .NET Aspire.
+### Pourquoi j'écris
 
-Tenir les deux bouts en même temps m'a obligé à comprendre **chaque** changement en profondeur. Pas juste "le nouveau truc à la mode", mais *pourquoi* chaque virage a eu lieu, *quel problème* il réglait vraiment, et *quel compromis* il introduisait en échange. Et comme je forme des développeurs en parallèle de mon travail de delivery depuis des années, j'ai dû garder une carte mentale vivante de toute cette évolution, pour pouvoir l'expliquer à quelqu'un qui débarque en plein milieu.
+J'ai vu .NET évoluer à travers chaque virage majeur : ASP.NET MVC, les middlewares OWIN, .NET Core, le software craftsmanship, le N-Couches, la Clean Architecture, CQRS, le Vertical Slicing, les microservices, les monolithes modulaires, les containers, Kubernetes, l'observabilité, .NET Aspire. J'ai dû comprendre **chaque** changement, pas parce que je collectionne les buzzwords, mais parce qu'un formateur ne peut pas tricher : quand tu expliques un pattern à une salle de devs mid-level, il faut que tu saches *pourquoi* il existe, *quel problème* il règle vraiment, et *quel compromis* il introduit en échange.
 
-Ce blog, c'est cette carte mentale, mise à l'écrit.
+Ce blog, c'est cette connaissance mise à l'écrit. La même carte mentale que j'utilise quand je forme une équipe pendant une semaine d'atelier, accessible à quiconque veut passer du mid-level au senior à son rythme.
 
-J'ai passé des années à faire ce que la plupart des tutoriels évitent : migrer des applications WS-Federation legacy vers Keycloak sans les réécrire, construire du tracing distribué from scratch sur des clusters IIS, concevoir des monolithes modulaires que les équipes peuvent réellement maintenir, et expliquer à des directions non-techniques pourquoi les décisions d'architecture ont des conséquences concrètes.
+J'ai passé des années à faire ce que la plupart des tutoriels évitent : migrer de l'authentification legacy vers Keycloak sans réécrire l'application, câbler du tracing distribué sur de vraies infrastructures, concevoir des monolithes modulaires que les équipes peuvent réellement maintenir, et expliquer à des directions non-techniques pourquoi les décisions d'architecture ont des conséquences concrètes.
 
 ---
 
@@ -46,8 +46,8 @@ Tout le contenu est publié en français et en anglais. La version française n'
 
 ## Disponible pour des formations
 
-Je suis disponible pour des sessions de formation et des ateliers à destination des équipes de développement .NET. Les thèmes couverts incluent tout ce qui est publié sur ce blog : Clean Architecture, Docker et Kubernetes, intégration Keycloak, observabilité avec OpenTelemetry, et bien plus.
+Je suis disponible pour des sessions de formation et des ateliers à destination des équipes .NET et Angular. Les thèmes couverts incluent tout ce qui est publié sur ce blog : Clean Architecture, Docker et Kubernetes, intégration Keycloak, observabilité avec OpenTelemetry, stratégies de tests, et bien plus.
 
-Si ton équipe est en transition depuis du .NET legacy vers des pratiques modernes et a besoin d'un accompagnement structuré et concret, contacte-moi.
+Si ton équipe veut aller vers du .NET moderne et Angular, et a besoin d'un accompagnement structuré et concret par quelqu'un qui a livré ces patterns pour de vrais clients, contacte-moi.
 
 **Contact :** [LinkedIn](https://linkedin.com/in/your-profile) &nbsp;|&nbsp; [GitHub](https://github.com/MohamedMustapha)
