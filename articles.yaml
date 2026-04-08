@@ -352,7 +352,7 @@ series:
         title_fr: "Le Stress Testing"
         slug: "load-testing-stress"
         tags: ["load-testing", "stress", "performance"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Spike Testing"
         title_fr: "Le Spike Testing"
