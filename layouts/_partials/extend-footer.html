@@ -1,0 +1,133 @@
+<style>
+  .mermaid {
+    cursor: zoom-in;
+    overflow-x: auto;
+  }
+  .mermaid svg {
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 300px;
+  }
+  #mermaid-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    z-index: 9999;
+    cursor: zoom-out;
+    touch-action: none;
+  }
+  #mermaid-lightbox.open { display: flex; align-items: center; justify-content: center; }
+  #mermaid-lightbox-inner {
+    width: 95vw;
+    height: 92vh;
+    overflow: hidden;
+    position: relative;
+  }
+  #mermaid-lightbox-stage {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform-origin: 0 0;
+    transition: transform 0.05s linear;
+  }
+  #mermaid-lightbox svg {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  #mermaid-lightbox-hint {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: #fff;
+    font-size: 0.85rem;
+    background: rgba(0,0,0,0.5);
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+</style>
+<div id="mermaid-lightbox" aria-hidden="true">
+  <div id="mermaid-lightbox-inner">
+    <div id="mermaid-lightbox-stage"></div>
+    <div id="mermaid-lightbox-hint">click or Esc to close, scroll to zoom, drag to pan</div>
+  </div>
+</div>
+<script>
+(function () {
+  function init() {
+    var lb = document.getElementById('mermaid-lightbox');
+    if (!lb) return;
+    var stage = document.getElementById('mermaid-lightbox-stage');
+    var scale = 1, tx = 0, ty = 0, dragging = false, sx = 0, sy = 0;
+
+    function apply() {
+      stage.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+    }
+    function reset() { scale = 1; tx = 0; ty = 0; apply(); }
+    function close() {
+      lb.classList.remove('open');
+      stage.innerHTML = '';
+      reset();
+    }
+    function open(svg) {
+      var clone = svg.cloneNode(true);
+      clone.removeAttribute('style');
+      stage.innerHTML = '';
+      stage.appendChild(clone);
+      reset();
+      lb.classList.add('open');
+    }
+
+    document.addEventListener('click', function (e) {
+      var host = e.target.closest('.mermaid');
+      if (!host || host.closest('#mermaid-lightbox')) return;
+      var svg = host.querySelector('svg');
+      if (svg) open(svg);
+    });
+
+    lb.addEventListener('click', function (e) {
+      if (e.target === lb || e.target.id === 'mermaid-lightbox-inner') close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lb.classList.contains('open')) close();
+    });
+    lb.addEventListener('wheel', function (e) {
+      if (!lb.classList.contains('open')) return;
+      e.preventDefault();
+      var rect = stage.getBoundingClientRect();
+      var mx = e.clientX - rect.left;
+      var my = e.clientY - rect.top;
+      var delta = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      var newScale = Math.max(0.3, Math.min(8, scale * delta));
+      var ratio = newScale / scale;
+      tx = mx - ratio * (mx - tx);
+      ty = my - ratio * (my - ty);
+      scale = newScale;
+      apply();
+    }, { passive: false });
+    lb.addEventListener('mousedown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      dragging = true; sx = e.clientX - tx; sy = e.clientY - ty;
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      tx = e.clientX - sx; ty = e.clientY - sy; apply();
+    });
+    window.addEventListener('mouseup', function () { dragging = false; });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
