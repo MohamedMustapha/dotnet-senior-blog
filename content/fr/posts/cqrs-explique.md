@@ -14,7 +14,7 @@ Hello tous le monde, aujourd'hui on va démystifier **CQRS**, cet acronyme qu'on
 
 À la fin des années 80, Bertrand Meyer formalise dans *Object-Oriented Software Construction* le principe de **Command Query Separation (CQS)** : une méthode doit soit effectuer une action (commande), soit retourner une donnée (query), jamais les deux. Simple, élégant, et largement ignoré en pratique.
 
-Avance rapide jusqu'en 2010. Greg Young pousse l'idée d'un cran : au lieu de séparer les méthodes sur un même objet, on sépare carrément le **modèle**. Un modèle optimisé pour l'écriture, un autre pour la lecture. Il baptise ça **Command Query Responsibility Segregation**, CQRS.
+On avance jusqu'en 2010. Greg Young pousse l'idée plus loin : au lieu de séparer les méthodes sur un même objet, on sépare carrément le **modèle**. Un modèle optimisé pour l'écriture, un autre pour la lecture. Il baptise ça **Command Query Responsibility Segregation**, CQRS.
 
 Pourquoi c'est devenu une affaire ? Parce que le pattern classique du "gros service" finit toujours par craquer :
 
@@ -260,7 +260,7 @@ C'est là que la plupart des équipes se perdent :
 
 CQRS est une discipline structurelle : un modèle pour écrire, un modèle pour lire, et aucun handler qui fait les deux boulots à la fois. Né du CQS de Meyer, généralisé par Greg Young, il tient la charge parce qu'il arrête de forcer un seul modèle mental à servir deux workloads radicalement différents.
 
-Tu sais maintenant d'où vient CQRS, la différence entre CQS et CQRS, comment modéliser tes commandes et tes queries avec MediatR en ASP.NET Core, et quels mythes ignorer. Tu peux commencer à refactorer un gros service en handlers focalisés dès aujourd'hui, et tu peux le faire sans toucher à la topologie de ta base.
+Tu sais maintenant d'où vient CQRS, la différence entre CQS et CQRS, comment modéliser tes commandes et tes queries avec MediatR en ASP.NET Core, et quels mythes ignorer. Tu peux commencer à refactorer un gros service en handlers focalisés dès aujourd'hui, et tu peux le faire sans toucher à la topologie de la base.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ?
 À la prochaine, a++ 👋

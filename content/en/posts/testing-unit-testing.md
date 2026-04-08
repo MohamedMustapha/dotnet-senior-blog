@@ -103,7 +103,7 @@ One test method, four test cases, four rows in the runner. Adding a new tier is 
 
 ## Zoom: mocking, carefully
 
-Mocking is the most frequently misapplied technique in unit testing. The rule is simple: mock **boundaries**, not **behavior**. A boundary is an interface your SUT calls out to (repository, HTTP client, time provider). Everything else should be real.
+Mocking is the technique most often applied incorrectly in unit testing. The rule is simple: mock **boundaries**, not **behavior**. A boundary is an interface your SUT calls out to (repository, HTTP client, time provider). Everything else should be real.
 
 ```csharp
 [Fact]
@@ -176,7 +176,7 @@ service.IsActive(new Promotion { EndsAt = DateTimeOffset.Parse("2026-04-09T00:00
 
 ## Wrap-up
 
-You now know how to write unit tests that actually earn their keep: scoped to a single behavior, using the AAA layout, mocking only at boundaries, running in milliseconds, and surviving refactors without rewriting. You can pick xUnit v3 plus FluentAssertions plus NSubstitute as a safe default, use `[Theory]` for input tables, inject `TimeProvider` instead of hitting the system clock, and recognize the cases where a unit test is not the right tool.
+You now know how to write unit tests that are genuinely useful: scoped to a single behavior, using the AAA layout, mocking only at boundaries, running in milliseconds, and surviving refactors without rewriting. You can pick xUnit v3 plus FluentAssertions plus NSubstitute as a safe default, use `[Theory]` for input tables, inject `TimeProvider` instead of hitting the system clock, and recognize the cases where a unit test is not the right tool.
 
 Ready to level up your next project or share it with your team? See you in the next one, Integration Testing with TestContainers is where we go next.
 

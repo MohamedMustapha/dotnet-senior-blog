@@ -5,7 +5,7 @@ draft: false
 tags: ["testing", "api", "webapplicationfactory", "dotnet"]
 categories: ["Testing"]
 series: ["Testing"]
-description: "Test your real ASP.NET Core pipeline end to end, in-process, without Kestrel or a real HTTP port. WebApplicationFactory sits between unit tests and full E2E, and for most API testing needs, it is where the best return on effort lives."
+description: "Test your real ASP.NET Core pipeline end to end, in-process, without Kestrel or a real HTTP port. WebApplicationFactory sits between unit tests and full E2E, and for most API testing needs, it offers the best return on effort."
 ---
 
 Between [unit tests](/posts/testing-unit-testing/) and full browser-driven [end-to-end tests](/posts/testing-e2e-playwright/) sits a very productive middle layer: tests that spin up your *real* ASP.NET Core pipeline (routing, model binding, middleware, filters, DI, authentication) in the same process as the test, and drive it through an in-memory `HttpClient`. No Kestrel, no socket, no browser. Just your app, running for real, in milliseconds.

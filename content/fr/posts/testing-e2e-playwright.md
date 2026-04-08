@@ -10,9 +10,9 @@ description: "Des tests end-to-end pilotés par un vrai navigateur en .NET avec 
 
 Hello tous le monde, aujourd'hui on va découvrir les **tests end-to-end avec Playwright** pour .NET.
 
-Les tests end-to-end ont acquis une réputation difficile au fil des années, et pour de bonnes raisons. Dix ans de suites Selenium flakys, des implicit waits qui n'attendent jamais tout à fait assez, des sélecteurs XPath qui cassent à chaque refresh d'UI, et des runs de CI qui plantent "parfois" ont convaincu beaucoup d'équipes que le E2E ne valait pas le coup. Ils avaient raison à propos de Selenium. Ils avaient tort à propos du E2E.
+Les tests end-to-end ont acquis une réputation difficile au fil des années, et non sans raison. Dix ans de suites Selenium instables, des implicit waits qui n'attendent jamais tout à fait assez, des sélecteurs XPath qui cassent à chaque refresh d'UI, et des runs de CI qui plantent "parfois" ont convaincu beaucoup d'équipes que le E2E ne valait pas le coup. Ils avaient raison à propos de Selenium. Ils avaient tort à propos du E2E.
 
-Playwright a changé la donne. Microsoft l'a publié en 2020 comme successeur moderne de Puppeteer, et les bindings .NET ont suivi début 2021. Il embarque Chromium, Firefox et WebKit, fait de l'auto-wait sur les éléments avant d'agir, isole chaque test dans un contexte de navigateur frais, et livre un générateur de code qui enregistre tes actions en fichier de test. Si tu as lu les articles précédents sur [les tests unitaires](/fr/posts/testing-unit-testing/), [les tests d'intégration avec TestContainers](/fr/posts/testing-integration-testing-testcontainers/), et [les tests API avec WebApplicationFactory](/fr/posts/testing-webapplicationfactory/), tu as déjà les couches rapides, peu chères, in-process. Playwright, c'est le sommet de la pyramide : plus lent, mais la seule chose qui prouve que ton appli marche vraiment comme un utilisateur va l'utiliser.
+Playwright a changé la donne. Microsoft l'a publié en 2020 comme successeur moderne de Puppeteer, et les bindings .NET ont suivi début 2021. Il embarque Chromium, Firefox et WebKit, fait de l'auto-wait sur les éléments avant d'agir, isole chaque test dans un contexte de navigateur frais, et livre un générateur de code qui enregistre tes actions en fichier de test. Si tu as lu les articles précédents sur [les tests unitaires](/fr/posts/testing-unit-testing/), [les tests d'intégration avec TestContainers](/fr/posts/testing-integration-testing-testcontainers/), et [les tests API avec WebApplicationFactory](/fr/posts/testing-webapplicationfactory/), tu as déjà les couches rapides, peu chères, in-process. Playwright, c'est le sommet de la pyramide : plus lent, mais la seule chose qui prouve que l'application marche vraiment comme un utilisateur va l'utiliser.
 
 ## Le contexte : pourquoi ce pattern existe
 
@@ -32,15 +32,15 @@ Playwright livre les trois.
 graph TD
     A[Test Playwright] --> B[Microsoft.Playwright.NUnit<br/>ou wrapper MSTest / xUnit]
     B --> C[Navigateur<br/>Chromium / Firefox / WebKit]
-    C --> D[Ton appli qui tourne<br/>Kestrel sur localhost:5000]
+    C --> D[L'application qui tourne<br/>Kestrel sur localhost:5000]
     D --> E[(Postgres depuis TestContainers)]
     A --> F[Page Object<br/>CheckoutPage]
     F --> C
 {{< /mermaid >}}
 
-Le test pilote un vrai navigateur. Le navigateur parle à ton appli qui tourne, qui elle-même parle à une vraie base. Le pattern Page Object garde les sélecteurs à un seul endroit, pour que les refactorings d'UI touchent un fichier et pas toute la suite.
+Le test pilote un vrai navigateur. Le navigateur parle à l'application qui tourne, qui elle-même parle à une vraie base. Le pattern Page Object garde les sélecteurs à un seul endroit, pour que les refactorings d'UI touchent un fichier et pas toute la suite.
 
-> 💡 **Info** : Playwright pour .NET livre son propre runner de tests via les packages `Microsoft.Playwright.NUnit` / `Microsoft.Playwright.MSTest`. Ils te donnent l'exécution parallèle, un contexte navigateur frais par test, et l'enregistrement de traces out of the box. Tu peux aussi utiliser `PlaywrightSharp` brut dans xUnit, mais l'adapteur NUnit est plus mature.
+> 💡 **Info** : Playwright pour .NET livre son propre runner de tests via les packages `Microsoft.Playwright.NUnit` / `Microsoft.Playwright.MSTest`. Ils te donnent l'exécution parallèle, un contexte navigateur frais par test, et l'enregistrement de traces nativement. Tu peux aussi utiliser `PlaywrightSharp` brut dans xUnit, mais l'adapteur NUnit est plus mature.
 
 ## Zoom : installation et premier test
 
@@ -78,7 +78,7 @@ public class CheckoutTests : PageTest
 
 `PageTest` te donne une `Page` fraîche par test et libère tout à la fin. Aucun boilerplate.
 
-> ✅ **Bonne pratique** : Préfère `GetByRole`, `GetByLabel`, `GetByPlaceholder` et `GetByText` aux sélecteurs CSS ou XPath. Ils matchent la façon dont les utilisateurs et les technos d'assistance perçoivent la page, et ils survivent aux renommages de classes CSS.
+> ✅ **Bonne pratique** : Préfère `GetByRole`, `GetByLabel`, `GetByPlaceholder` et `GetByText` aux sélecteurs CSS ou XPath. Elles correspondent à la façon dont les utilisateurs et les technos d'assistance perçoivent la page, et ils survivent aux renommages de classes CSS.
 
 ## Zoom : locators et auto-wait
 
@@ -159,7 +159,7 @@ public sealed class AppFixture : IDisposable
 
 Avantages : pas de dépendance externe, le test possède le cycle de vie. Inconvénient : il te faut du vrai Kestrel, pas le `TestServer` in-memory, parce que Playwright pilote un vrai navigateur qui a besoin d'un vrai socket.
 
-**2. La lancer comme process séparé** : un job CI démarre `dotnet run` en arrière-plan, attend le health endpoint, puis lance la suite Playwright. Plus réaliste, plus proche de la prod, mais plus de pièces mobiles.
+**2. La lancer comme process séparé** : un job CI démarre `dotnet run` en arrière-plan, attend le health endpoint, puis lance la suite Playwright. Plus réaliste, plus proche de la prod, mais plus de éléments à orchestrer.
 
 L'option 1 est le sweet spot pour la plupart des équipes.
 
@@ -209,7 +209,7 @@ Suis la pyramide : beaucoup de tests unitaires, moins de tests d'intégration, t
 
 ## Wrap-up
 
-Tu sais maintenant écrire des tests end-to-end qui survivent vraiment : installer Playwright et ses navigateurs, utiliser des locators basés sur les roles et les labels pour que tes tests matchent comment les utilisateurs et les outils d'accessibilité perçoivent la page, t'appuyer sur l'auto-wait au lieu de sleeps manuels, organiser les sélecteurs via le pattern Page Object, héberger l'appli sous test avec `WebApplicationFactory` sur un vrai port Kestrel, et capturer des traces pour les runs qui échouent en CI. Tu peux garder la suite tendue, concentrée sur les parcours critiques, et la faire tourner en minutes plutôt qu'en heures.
+Tu sais maintenant écrire des tests end-to-end qui survivent vraiment : installer Playwright et ses navigateurs, utiliser des locators basés sur les roles et les labels pour que tes tests reflètent la façon dont les utilisateurs et les outils d'accessibilité perçoivent la page, t'appuyer sur l'auto-wait au lieu de sleeps manuels, organiser les sélecteurs via le pattern Page Object, héberger l'appli sous test avec `WebApplicationFactory` sur un vrai port Kestrel, et capturer des traces pour les runs qui échouent en CI. Tu peux garder la suite concise, concentrée sur les parcours critiques, et la faire tourner en minutes plutôt qu'en heures.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 

@@ -16,7 +16,7 @@ Attention, c'est pas exactement la même chose que l'architecture N-Couches, mê
 
 ## Le contexte : pourquoi ce pattern existe
 
-Imaginons que nous ayons une petite équipe qui construit un outil interne. Un seul projet ASP.NET Core, une trentaine d'endpoints, une base de données. Créer quatre csproj, tricoter les références entre projets et débattre de savoir si `AutoMapper` va dans Infrastructure ou dans Application, c'est de l'overkill. Ce qu'il faut vraiment à cette équipe, c'est :
+Imaginons que nous ayons une petite équipe qui construit un outil interne. Un seul projet ASP.NET Core, une trentaine d'endpoints, une base de données. Créer quatre csproj, tricoter les références entre projets et débattre de savoir si `AutoMapper` va dans Infrastructure ou dans Application, c'est surdimensionné. Ce qu'il faut vraiment à cette équipe, c'est :
 
 1. **Un endroit pour le HTTP**, pour que les controllers restent lisibles.
 2. **Un endroit pour la logique métier**, pour arrêter de debugger à travers six fichiers juste pour comprendre une règle.
@@ -122,7 +122,7 @@ public sealed class OrderRepository : IOrderRepository
 
 ### Services : là où vivent les règles
 
-Un service dépend d'un ou plusieurs repositories et contient les règles métier. Pas de types HTTP (`IActionResult`, `HttpContext`), pas de types EF Core (`IQueryable`, `DbSet`). Juste ton domaine et les interfaces.
+Un service dépend d'un ou plusieurs repositories et contient les règles métier. Pas de types HTTP (`IActionResult`, `HttpContext`), pas de types EF Core (`IQueryable`, `DbSet`). Juste le domaine et les interfaces.
 
 ```csharp
 // Services/IOrderService.cs

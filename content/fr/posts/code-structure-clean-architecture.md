@@ -10,9 +10,9 @@ description: "Clean Architecture, ce n'est pas quatre projets et un diagramme en
 
 Hello tous le monde, aujourd'hui on va démystifier la **Clean Architecture**, probablement le pattern le plus cité et le plus mal compris dans le monde .NET.
 
-Clean Architecture a un problème de branding. Beaucoup de codebases .NET qui l'affichent dans leur README ressemblent en fait à du N-Couches avec des dossiers renommés, et d'autres accumulent assez d'interfaces, de mappers et de sauts de DTOs pour qu'un simple listing produit devienne une expédition multi-fichiers. Ces deux situations s'expliquent facilement : le pattern est souvent introduit sans son cadrage d'origine, et les équipes comblent le vide avec du cérémonial. L'idée d'origine, celle que Robert Martin a formalisée en 2012 (en s'appuyant sur des travaux plus anciens comme l'Hexagonal Architecture d'Alistair Cockburn en 2005 et l'Onion Architecture de Jeffrey Palermo en 2008), est beaucoup plus petite et beaucoup plus utile : **tes règles métier ne doivent dépendre ni de ton framework, ni de ta base de données, ni de ta stack HTTP**. Tout le reste, c'est du détail d'implémentation.
+Clean Architecture a un problème de branding. Beaucoup de codebases .NET qui l'affichent dans leur README ressemblent en fait à du N-Couches avec des dossiers renommés, et d'autres accumulent assez d'interfaces, de mappers et de sauts de DTOs pour qu'un simple listing produit devienne un parcours à travers plusieurs fichiers. Ces deux situations s'expliquent facilement : le pattern est souvent introduit sans son cadrage d'origine, et les équipes comblent le vide avec du cérémonial. L'idée d'origine, celle que Robert Martin a formalisée en 2012 (en s'appuyant sur des travaux plus anciens comme l'Hexagonal Architecture d'Alistair Cockburn en 2005 et l'Onion Architecture de Jeffrey Palermo en 2008), est beaucoup plus petite et beaucoup plus utile : **tes règles métier ne doivent dépendre ni de ton framework, ni de la base de données, ni de ta stack HTTP**. Tout le reste, c'est du détail d'implémentation.
 
-Si tu as lu les articles précédents de cette série, tu connais déjà les deux patterns qui sont venus avant : [l'architecture N-Couches](/fr/posts/code-structure-n-layered/) avec ses projets physiquement séparés, et [UI / Repositories / Services](/fr/posts/code-structure-ui-repos-services/) avec son découpage pragmatique à l'intérieur d'un seul projet. Clean Architecture, c'est ce que tu sors du placard quand ces patterns commencent à fuir et que tu as besoin du compilateur pour tenir la frontière entre ton domaine et le monde extérieur.
+Si tu as lu les articles précédents de cette série, tu connais déjà les deux patterns qui sont venus avant : [l'architecture N-Couches](/fr/posts/code-structure-n-layered/) avec ses projets physiquement séparés, et [UI / Repositories / Services](/fr/posts/code-structure-ui-repos-services/) avec son découpage pragmatique à l'intérieur d'un seul projet. Clean Architecture, c'est ce que tu sors du placard quand ces patterns commencent à fuir et que tu as besoin du compilateur pour tenir la frontière entre le domaine et le monde extérieur.
 
 ## Le contexte : pourquoi ce pattern existe
 
@@ -24,7 +24,7 @@ Voilà la douleur que Clean Architecture soigne. Son contrat :
 2. **Ta couche application** orchestre les cas d'usage en ne manipulant que des abstractions.
 3. **L'infrastructure se branche depuis l'extérieur** et peut être remplacée sans toucher au domaine.
 
-Le gain n'est pas théorique. C'est la possibilité de monter EF Core de version, de changer de bus de messages, ou de remplacer ton prestataire de paiement sans ouvrir ton projet de domaine. C'est aussi la possibilité d'écrire des tests unitaires rapides sur tes règles métier sans démarrer une base de données.
+Le gain n'est pas théorique. C'est la possibilité de monter EF Core de version, de changer de bus de messages, ou de remplacer ton prestataire de paiement sans ouvrir le projet de domaine. C'est aussi la possibilité d'écrire des tests unitaires rapides sur tes règles métier sans démarrer une base de données.
 
 ## Vue d'ensemble : les couches et la règle
 
@@ -94,7 +94,7 @@ Remarque ce qui n'est **pas** là : pas d'attribut `[Table]`, pas de `DbContext`
 
 > ✅ **Bonne pratique** : Mets tes constructeurs en privé ou internal et expose des méthodes factory (`Order.Create(...)`). Ça force tous les appelants à passer par tes vérifications d'invariants. Il n'y a aucun moyen d'obtenir un `Order` cassé depuis l'extérieur.
 
-> ❌ **Ne jamais faire** : Ne colle pas d'attributs `[Column]` ou `[Required]` sur tes entités de domaine pour "gagner du temps". Dès que tu le fais, ton projet Domain gagne une dépendance dure sur un ORM, et l'invariant "Domain ne référence rien" cesse d'être vrai. L'API fluent d'EF Core dans Infrastructure te donne le même mapping sans faire fuiter le framework jusque dans tes entités.
+> ❌ **Ne jamais faire** : Ne colle pas d'attributs `[Column]` ou `[Required]` sur tes entités de domaine pour "gagner du temps". Dès que tu le fais, le projet Domain gagne une dépendance dure sur un ORM, et l'invariant "Domain ne référence rien" cesse d'être vrai. L'API fluent d'EF Core dans Infrastructure te donne le même mapping sans faire fuiter le framework jusque dans tes entités.
 
 ## Zoom : Application, les cas d'usage
 
@@ -284,7 +284,7 @@ Si aucune de ces conditions n'est remplie, tu paies la taxe sans toucher les bé
 
 ## Wrap-up
 
-Tu sais maintenant ce qu'est vraiment la Clean Architecture : une seule règle sur le sens des dépendances, respectée par les références de projets et parfois par des tests d'architecture. Tu peux monter les quatre projets, mettre tes invariants dans le Domain, garder tes cas d'usage dans Application, brancher Infrastructure depuis l'extérieur, et garder l'Api comme une composition root fine. Tu peux aussi reconnaître quand ton codebase n'a pas besoin de ce niveau de structure et choisir une option plus légère.
+Tu sais maintenant ce qu'est vraiment la Clean Architecture : une seule règle sur le sens des dépendances, respectée par les références de projets et parfois par des tests d'architecture. Tu peux monter les quatre projets, mettre tes invariants dans le Domain, garder tes cas d'usage dans Application, brancher Infrastructure depuis l'extérieur, et garder l'Api comme une composition root fine. Tu peux aussi reconnaître quand le codebase n'a pas besoin de ce niveau de structure et choisir une option plus légère.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 

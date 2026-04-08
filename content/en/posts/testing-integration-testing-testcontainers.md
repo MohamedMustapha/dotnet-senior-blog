@@ -159,7 +159,7 @@ Call `ResetDatabaseAsync` in a test constructor or an `IAsyncLifetime` on the te
 
 ## Zoom: the scenarios you could not test before
 
-This is where TestContainers earns its place. Three concrete examples of things that were effectively impossible (or cost you a week of YAML) before, and that now fit in a fixture.
+This is where TestContainers shows its full value. Three concrete examples of things that were effectively impossible (or cost you a week of YAML) before, and that now fit in a fixture.
 
 ### Postgres-specific behavior: fuzzy search with pg_trgm
 

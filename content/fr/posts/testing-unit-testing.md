@@ -20,7 +20,7 @@ Supposons que nous ayons une équipe qui livre un moteur de pricing. Les règles
 
 Ce qu'il faut vraiment à cette équipe :
 
-1. **Un feedback rapide** : une barre verte en moins d'une seconde quand la logique est bonne.
+1. **Un feedback rapide** : un retour vert en moins d'une seconde quand la logique est bonne.
 2. **Une régression ciblée** : quand un changement casse la règle #7 précisément, le test en échec dit quelle règle et quel input.
 3. **La confiance pour refactorer** : pouvoir restructurer l'intérieur du calculator sans réécrire la suite de tests.
 
@@ -105,7 +105,7 @@ Une seule méthode de test, quatre cas, quatre lignes dans le runner. Ajouter un
 
 ## Zoom : mocker, mais prudemment
 
-Le mocking, c'est la technique la plus souvent mal employée dans les tests. La règle est simple : mocke les **frontières**, pas le **comportement**. Une frontière, c'est une interface vers laquelle ton SUT appelle (repository, client HTTP, provider de temps). Tout le reste doit être réel.
+Le mocking, c'est la technique la plus souvent mal employée dans les tests. La règle est simple : mocke les **frontières**, pas le **comportement**. Une frontière, c'est une interface vers laquelle le SUT appelle (repository, client HTTP, provider de temps). Tout le reste doit être réel.
 
 ```csharp
 [Fact]
@@ -135,7 +135,7 @@ public async Task Submit_debite_le_client_et_marque_la_commande_soumise()
 
 L'entité de domaine `Order` est **vraie**, pas mockée. Seuls `IPaymentGateway` et `IOrderRepository` sont substitués, parce qu'ils parlent au monde extérieur.
 
-> ⚠️ **Ça marche, mais...** : Si tu te retrouves à mocker tes propres classes de domaine (`Order`, `Invoice`, `Customer`), prends du recul. Soit la classe est une frontière déguisée (extrais une interface), soit le test teste le mock, pas le SUT.
+> ⚠️ **Ça marche, mais...** : Si nous nous retrouvons à mocker tes propres classes de domaine (`Order`, `Invoice`, `Customer`), prends du recul. Soit la classe est une frontière déguisée (extrais une interface), soit le test teste le mock, pas le SUT.
 
 > ❌ **Ne jamais faire** : N'écris pas de tests qui assertent `mock.Received(1).HelperInterne()`. Tu fixes l'implémentation, pas le comportement. Un refactoring qui garde le même contrat public cassera tes tests pour rien.
 
@@ -178,7 +178,7 @@ service.IsActive(new Promotion { EndsAt = DateTimeOffset.Parse("2026-04-09T00:00
 
 ## Wrap-up
 
-Tu sais maintenant écrire des tests unitaires qui gagnent vraiment leur place : scopés sur un seul comportement, avec le layout AAA, en mockant uniquement les frontières, qui tournent en millisecondes, et qui survivent aux refactorings sans tout réécrire. Tu peux choisir xUnit v3 + FluentAssertions + NSubstitute comme défaut safe, utiliser `[Theory]` pour les tables d'inputs, injecter `TimeProvider` au lieu de taper l'horloge système, et reconnaître les cas où un test unitaire n'est pas le bon outil.
+Tu sais maintenant écrire des tests unitaires qui sont réellement utiles : scopés sur un seul comportement, avec le layout AAA, en mockant uniquement les frontières, qui tournent en millisecondes, et qui survivent aux refactorings sans tout réécrire. Tu peux choisir xUnit v3 + FluentAssertions + NSubstitute comme défaut safe, utiliser `[Theory]` pour les tables d'inputs, injecter `TimeProvider` au lieu de taper l'horloge système, et reconnaître les cas où un test unitaire n'est pas le bon outil.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 

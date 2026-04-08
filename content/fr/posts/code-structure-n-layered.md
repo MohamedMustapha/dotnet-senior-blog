@@ -297,7 +297,7 @@ MyApp.sln
     └── MyApp.Infrastructure.Tests/
 ```
 
-> 💡 **Info** : `MyApp.Domain` doit avoir **zéro** dépendance NuGet externe. Si tu te retrouves à ajouter EF Core ou n'importe quel framework dans Domain, c'est que le sens de tes dépendances est mauvais.
+> 💡 **Info** : `MyApp.Domain` doit avoir **zéro** dépendance NuGet externe. Si nous nous retrouvons à ajouter EF Core ou n'importe quel framework dans Domain, c'est que le sens de tes dépendances est mauvais.
 
 ---
 
@@ -305,7 +305,7 @@ MyApp.sln
 
 Ce pattern fonctionne très bien pour les applications petites à moyennes. Il commence à montrer ses limites quand le codebase grossit :
 
-- **Services anémiques** : tu te retrouves avec un `ProductService` qui a 25 méthodes, une par cas d'usage. Impossible à naviguer.
+- **Services anémiques** : nous nous retrouvons avec un `ProductService` qui a 25 méthodes, une par cas d'usage. Impossible à naviguer.
 - **Repositories obèses** : ils accumulent des méthodes de requêtes custom jusqu'à devenir ingérables.
 - **Couplage inter-fonctionnalités** : ajouter une nouvelle feature oblige à toucher chaque couche à chaque fois.
 
@@ -313,7 +313,7 @@ C'est pas une raison de fuir le N-Couches, c'est un signal d'évolution. La suit
 
 ## Wrap-up
 
-Tu sais maintenant ce qu'est l'architecture N-Couches, comment chaque couche s'articule avec les autres, et comment l'implémenter correctement dans une vraie solution .NET. Tu peux structurer un nouveau projet from scratch, garder tes controllers fins, isoler la logique métier dans les services, et abstraire l'accès aux données derrière des interfaces de repository.
+Tu sais maintenant ce qu'est l'architecture N-Couches, comment chaque couche s'articule avec les autres, et comment l'implémenter correctement dans une vraie solution .NET. Tu peux structurer un nouveau projet depuis zéro, garder tes controllers fins, isoler la logique métier dans les services, et abstraire l'accès aux données derrière des interfaces de repository.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 

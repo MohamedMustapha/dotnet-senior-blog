@@ -12,7 +12,7 @@ Hello tous le monde, aujourd'hui on va explorer les **tests d'intégration avec 
 
 Le test d'intégration est historiquement la discipline la plus compromise de la delivery .NET. Pas parce que les ingénieurs ne s'en souciaient pas, mais parce que les outils disponibles imposaient un choix entre une infrastructure partagée fragile et des tests qui, sans le dire, cessaient d'être des tests d'intégration. Si tu as lu l'article précédent sur [les tests unitaires en .NET](/fr/posts/testing-unit-testing/), tu sais déjà que mocker un `DbContext` ne peut pas attraper les bugs qui vivent dans le SQL généré. Ce que le métier attendait, c'était un moyen d'exécuter des tests d'intégration contre les vrais services auxquels ils prétendent s'intégrer, de façon reproductible, sans coordonner un environnement partagé.
 
-TestContainers fournit exactement cela. La bibliothèque Java d'origine a été publiée en 2015 par Richard North, et le port .NET est arrivé en 2017 sous le nom Testcontainers for .NET. C'est aujourd'hui le standard de référence, maintenu sous l'organisation GitHub `testcontainers`, et .NET 10 le traite comme un outil de test d'intégration de première classe. Le principe est direct : ton code de test démarre un vrai Postgres, Redis, RabbitMQ, Keycloak, ou n'importe quel autre service dans un container Docker éphémère, attend qu'il devienne prêt, expose ses informations de connexion, et le détruit quand la fixture de test se libère.
+TestContainers fournit exactement cela. La bibliothèque Java d'origine a été publiée en 2015 par Richard North, et le port .NET est arrivé en 2017 sous le nom Testcontainers for .NET. C'est aujourd'hui le standard de référence, maintenu sous l'organisation GitHub `testcontainers`, et .NET 10 le traite comme un outil de test d'intégration de première classe. Le principe est direct : le code de test démarre un vrai Postgres, Redis, RabbitMQ, Keycloak, ou n'importe quel autre service dans un container Docker éphémère, attend qu'il devienne prêt, expose ses informations de connexion, et le détruit quand la fixture de test se libère.
 
 ## Le contexte : pourquoi ce pattern existe
 
@@ -22,7 +22,7 @@ Pendant la plus grande partie de l'histoire de .NET, écrire un test d'intégrat
 
 **2. La CI/CD devait avoir un accès réseau à ces services partagés.** Les agents de build avaient besoin de routes vers la base de dev, de credentials renouvelés à la main, et de règles de firewall maintenues par une autre équipe. Chaque nouveau pipeline devenait un ticket. Chaque panne de l'infra partagée bloquait tous les builds. La disponibilité de la suite de tests était plafonnée par celle du service le moins fiable qu'elle appelait.
 
-**3. Le setup se cassait avec une facilité déconcertante.** Un simple `ALTER TABLE` appliqué par un ingénieur en debug, un changement de rôle dans Keycloak, une expiration de certificat SSL sur le relais SMTP, un snapshot Redis obsolète : n'importe lequel invalidait silencieusement la suite pour tout le monde. Les matinées commençaient par la question "la CI est rouge à cause de mon changement, ou parce que quelqu'un a touché à l'environnement de test ?".
+**3. Le setup se cassait avec une grande facilité.** Un simple `ALTER TABLE` appliqué par un ingénieur en debug, un changement de rôle dans Keycloak, une expiration de certificat SSL sur le relais SMTP, un snapshot Redis obsolète : n'importe lequel invalidait silencieusement la suite pour tout le monde. Les matinées commençaient par la question "la CI est rouge à cause de mon changement, ou parce que quelqu'un a touché à l'environnement de test ?".
 
 **4. Elle exigeait un cleanup et un entretien permanents de la part des développeurs eux-mêmes.** Les scripts de seed dérivaient par rapport aux migrations. Les utilisateurs de test s'accumulaient dans le fournisseur d'identité. Les lignes orphelines s'empilaient dans les tables de jointure. Quelqu'un dans l'équipe finissait par être le gardien officieux de l'environnement d'intégration, et son temps n'était jamais compté dans la planification.
 
@@ -49,7 +49,7 @@ graph TD
 
 La fixture de test possède le cycle de vie des containers. Le SUT reçoit une vraie chaîne de connexion et ne sait absolument pas qu'il parle à un container qui disparaîtra dans 20 secondes.
 
-> 💡 **Info** : TestContainers a besoin d'un Docker qui tourne sur la machine (Docker Desktop sous Windows/macOS, ou Docker rootless sous Linux). En CI, GitHub Actions et Azure DevOps fournissent tous les deux des runners Docker-in-Docker out of the box.
+> 💡 **Info** : TestContainers a besoin d'un Docker qui tourne sur la machine (Docker Desktop sous Windows/macOS, ou Docker rootless sous Linux). En CI, GitHub Actions et Azure DevOps fournissent tous les deux des runners Docker-in-Docker nativement.
 
 ## Zoom : une fixture Postgres avec xUnit
 
@@ -161,11 +161,11 @@ Appelle `ResetDatabaseAsync` dans le constructeur du test ou dans un `IAsyncLife
 
 ## Zoom : les scénarios que tu ne pouvais pas tester avant
 
-C'est là que TestContainers gagne sa place. Trois exemples concrets de choses qui étaient quasiment impossibles (ou qui te coûtaient une semaine de YAML) avant, et qui tiennent maintenant dans une fixture.
+C'est là que TestContainers montre sa vraie valeur. Trois exemples concrets de choses qui étaient quasiment impossibles (ou qui te coûtaient une semaine de YAML) avant, et qui tiennent maintenant dans une fixture.
 
 ### Comportement spécifique à Postgres : recherche floue avec pg_trgm
 
-Tu as un endpoint de recherche qui trouve des clients par nom approximatif avec l'extension `pg_trgm`. Aucun mock ne peut reproduire le ranking de `similarity()`. La seule façon de le tester, c'est contre un vrai Postgres.
+Supposons un endpoint de recherche qui trouve des clients par nom approximatif avec l'extension `pg_trgm`. Aucun mock ne peut reproduire le ranking de `similarity()`. La seule façon de le tester, c'est contre un vrai Postgres.
 
 ```csharp
 public sealed class SearchFixture : IAsyncLifetime
@@ -214,7 +214,7 @@ Le test prouve que l'extension est installée, que l'index est utilisé, et que 
 
 ### Keycloak avec un vrai realm, utilisateurs, rôles et clients
 
-L'autorisation par rôle est difficile à tester correctement. "Est-ce que `/admin/users` refuse un non-admin ?" demandait autrefois un Keycloak partagé, un realm curé à la main, et une convention que personne ne documentait. Avec TestContainers, tu importes un JSON de realm au démarrage du container, et tu obtiens tout : utilisateurs, mots de passe, rôles, clients, client scopes, mappers.
+L'autorisation par rôle est difficile à tester correctement. "Est-ce que `/admin/users` refuse un non-admin ?" demandait autrefois un Keycloak partagé, un realm paramétré à la main, et une convention que personne ne documentait. Avec TestContainers, tu importes un JSON de realm au démarrage du container, et tu obtiens tout : utilisateurs, mots de passe, rôles, clients, client scopes, mappers.
 
 ```csharp
 public sealed class KeycloakFixture : IAsyncLifetime
@@ -318,7 +318,7 @@ public sealed class AppServicesFixture : IAsyncLifetime
 
 `Task.WhenAll` les démarre en parallèle, économisant quelques secondes par run. Le premier run télécharge les images, les suivants réutilisent le cache Docker et démarrent en moins de deux secondes chacun.
 
-> ✅ **Bonne pratique** : Mets la fixture dans un projet de test partagé et référence-la depuis `IntegrationTests`, `ApiTests`, et `E2ETests`. Une seule source de vérité pour ce dont ton appli dépend.
+> ✅ **Bonne pratique** : Mets la fixture dans un projet de test partagé et référence-la depuis `IntegrationTests`, `ApiTests`, et `E2ETests`. Une seule source de vérité pour ce dont l'application dépend.
 
 ## Quand c'est surdimensionné
 

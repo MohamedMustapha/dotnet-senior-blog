@@ -8,9 +8,9 @@ series: ["Testing"]
 description: "Full browser-driven end-to-end tests in .NET with Playwright: reliable selectors, parallel execution, auto-wait, and the discipline that keeps the suite green."
 ---
 
-End-to-end tests have acquired a difficult reputation over the years, and with good reason. A decade of flaky Selenium suites, implicit waits that never quite wait long enough, XPath selectors that break every UI refresh, and CI runs that fail "sometimes" convinced many teams that E2E was not worth it. They were right about Selenium. They were wrong about E2E.
+End-to-end tests have acquired a difficult reputation over the years, and with good reason. Years of flaky Selenium suites, implicit waits that never quite wait long enough, XPath selectors that break every UI refresh, and CI runs that fail "sometimes" convinced many teams that E2E was not worth it. They were right about Selenium. They were wrong about E2E.
 
-Playwright changed the equation. Microsoft released it in 2020 as a modern successor to Puppeteer, and the .NET bindings followed in early 2021. It bundles Chromium, Firefox, and WebKit, auto-waits for elements to be actionable, isolates each test in a fresh browser context, and ships with a code generator that records your actions into a test file. If you have read the previous articles on [unit testing](/posts/testing-unit-testing/), [integration testing with TestContainers](/posts/testing-integration-testing-testcontainers/), and [API testing with WebApplicationFactory](/posts/testing-webapplicationfactory/), you already have the fast, cheap, in-process layers. Playwright is the top of the pyramid: slower, but the only thing that proves your app actually works the way a user will use it.
+Playwright changed the equation. Microsoft released it in 2020 as a modern successor to Puppeteer, and the .NET bindings followed in early 2021. It bundles Chromium, Firefox, and WebKit, auto-waits for elements to be actionable, isolates each test in a fresh browser context, and ships with a code generator that records your actions into a test file. If you have read the previous articles on [unit testing](/posts/testing-unit-testing/), [integration testing with TestContainers](/posts/testing-integration-testing-testcontainers/), and [API testing with WebApplicationFactory](/posts/testing-webapplicationfactory/), you already have the fast, cheap, in-process layers. Playwright is the top of the pyramid: slower, but the level at which you can verify the application behaves as a user will experience it.
 
 ## Why this pattern exists
 
@@ -161,7 +161,7 @@ Pros: no external dependency, test owns the lifecycle. Cons: you need the real K
 
 Option 1 is the sweet spot for most teams.
 
-> ⚠️ **It works, but...** : Pairing Playwright with TestContainers for the database works, and it is the most honest E2E you can get without a full staging environment. The trade-off is startup time: a cold run (pulling Postgres and browser binaries) can take 30 seconds. A warm run is fast.
+> ⚠️ **It works, but...** : Pairing Playwright with TestContainers for the database works, and it is the most representative E2E setup available without a full staging environment. The trade-off is startup time: a cold run (pulling Postgres and browser binaries) can take 30 seconds. A warm run is fast.
 
 ## Zoom: traces, videos, and debugging
 

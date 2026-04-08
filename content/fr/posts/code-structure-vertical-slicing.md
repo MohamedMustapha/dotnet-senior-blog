@@ -298,7 +298,7 @@ Extrais uniquement quand :
 - Le pattern est vraiment stable et a un nom clair.
 - L'extraction supprime un vrai risque, pas juste des lignes.
 
-> ❌ **Ne jamais faire** : Évite de construire une `BaseHandler<TCommand, TResponse>` avec des helpers protégés partagés entre les fonctionnalités. Ça a l'air propre au jour 1, et au bout de six mois le moindre changement sur la classe de base impacte toutes les slices d'un coup, ce qui est exactement le couplage que le Vertical Slicing cherche à éviter. Garde chaque slice indépendamment supprimable.
+> ❌ **Ne jamais faire** : Évite de construire une `BaseHandler<TCommand, TResponse>` avec des helpers protégés partagés entre les fonctionnalités. Ça paraît propre au début, et au bout de six mois le moindre changement sur la classe de base impacte toutes les slices d'un coup, ce qui est exactement le couplage que le Vertical Slicing cherche à éviter. Garde chaque slice indépendamment supprimable.
 
 ## Là où ça commence à faire mal
 
@@ -307,13 +307,13 @@ Aucun pattern n'est gratuit. Les modes de défaillance du Vertical Slicing sont 
 - **Pas de frontières de domaine imposées** : rien n'empêche un handler de court-circuiter une méthode de domaine et de muter une entité directement. Il faut de la discipline, ou des tests d'architecture, pour garder les invariants à leur place.
 - **Discoverability pour les nouveaux** : un dev habitué à "je dois changer le service des commandes, j'ouvre `OrderService.cs`" doit apprendre un nouveau modèle mental. "Je dois changer la façon dont les commandes sont soumises, j'ouvre `Features/Orders/SubmitOrder/`."
 - **Coordination inter-slices** : quand une règle métier s'étend sur quatre fonctionnalités, tu as quatre endroits à mettre à jour. Un bon nommage et les événements de domaine aident, mais c'est du vrai boulot.
-- **Peu d'intérêt sur des très petites applis** : si tu as quinze endpoints et pas de vrai domaine, un découpage en slices verticales a un côté overkill. UI / Repos / Services reste probablement le bon choix.
+- **Peu d'intérêt sur des très petites applis** : si tu as quinze endpoints et pas de vrai domaine, un découpage en slices verticales est surdimensionné. UI / Repos / Services reste probablement le bon choix.
 
 Le Vertical Slicing brille sur des applications de taille moyenne à large, avec des équipes actives, où les fonctionnalités changent souvent et où deux devs sur deux fonctionnalités ne doivent pas se marcher dessus.
 
 ## Wrap-up
 
-Tu sais maintenant ce qu'est vraiment le Vertical Slicing : organiser ton codebase par fonctionnalité pour que tout ce qu'il faut pour livrer un changement vive au même endroit. Tu peux écrire des slices autonomes avec commande, handler, validator et endpoint, court-circuiter le domaine sur les chemins de lecture pour des queries plus simples, garder les vraies préoccupations partagées dans un dossier `Common` ou `Infrastructure` fin, et résister à la tentation de dédupliquer trop tôt. Tu peux aussi reconnaître quand ce pattern colle et quand un découpage plus traditionnel reste la bonne réponse.
+Tu sais maintenant ce qu'est vraiment le Vertical Slicing : organiser le codebase par fonctionnalité pour que tout ce qu'il faut pour livrer un changement vive au même endroit. Tu peux écrire des slices autonomes avec commande, handler, validator et endpoint, court-circuiter le domaine sur les chemins de lecture pour des queries plus simples, garder les vraies préoccupations partagées dans un dossier `Common` ou `Infrastructure` fin, et résister à la tentation de dédupliquer trop tôt. Tu peux aussi reconnaître quand ce pattern colle et quand un découpage plus traditionnel reste la bonne réponse.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 

@@ -39,7 +39,7 @@ graph TD
     A --> D[Règles structurelles<br/>sealed, public, abstract, interfaces]
 {{< /mermaid >}}
 
-Les règles de dépendances sont les plus précieuses : elles protègent la forme de ton application. Les règles de nommage et structurelles sont moins chères mais s'additionnent pour donner une vraie cohérence à un grand codebase.
+Les règles de dépendances sont les plus précieuses : elles protègent la forme de l'applicationcation. Les règles de nommage et structurelles sont moins chères mais s'additionnent pour donner une vraie cohérence à un grand codebase.
 
 > 💡 **Info** : Les tests d'architecture tournent comme des tests xUnit / NUnit classiques. Pas d'outillage supplémentaire, pas de plugin SonarQube, pas d'analyseur Roslyn custom à moins que tu le veuilles. Les assertions s'exécutent en millisecondes contre tes assemblies compilés.
 
@@ -198,7 +198,7 @@ Si tu te surprends à écrire `Types.InAssembly(...).Should().HaveMethodBody("..
 
 ## Wrap-up
 
-Tu sais maintenant comment transformer des décisions d'architecture en invariants exécutables : choisir NetArchTest pour des règles fluent simples ou ArchUnitNET pour des assertions de graphe plus riches, commencer par les tests de direction de dépendances et de fuite de framework, ajouter des règles de nommage qui reflètent le vocabulaire partagé de ton équipe, mettre tout ça dans un projet de test d'architecture dédié, et refuser de les skipper sous pression. Tu peux rendre ton codebase résistant à la dérive structurelle lente qui tue tous les projets de longue durée.
+Tu sais maintenant comment transformer des décisions d'architecture en invariants exécutables : choisir NetArchTest pour des règles fluent simples ou ArchUnitNET pour des assertions de graphe plus riches, commencer par les tests de direction de dépendances et de fuite de framework, ajouter des règles de nommage qui reflètent le vocabulaire partagé de ton équipe, mettre tout ça dans un projet de test d'architecture dédié, et refuser de les skipper sous pression. Tu peux rendre le codebase résistant à la dérive structurelle lente qui tue tous les projets de longue durée.
 
 Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la prochaine, a++ 👋
 
