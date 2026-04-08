@@ -3,6 +3,7 @@ title: "Clean Architecture in .NET: Dependencies Pointing the Right Way"
 date: 2026-04-08
 draft: false
 tags: ["architecture", "dotnet", "clean-architecture"]
+categories: ["Architecture"]
 series: ["Code Structure"]
 description: "Clean Architecture is not about four projects and a circle diagram. It is about one rule: dependencies point inward. Here is how to build it in .NET without the dogma."
 ---

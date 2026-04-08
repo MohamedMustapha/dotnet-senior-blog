@@ -3,6 +3,7 @@ title: "UI / Repositories / Services : le découpage .NET pragmatique"
 date: 2026-04-08
 draft: false
 tags: ["architecture", "dotnet", "layered", "clean-code"]
+categories: ["Architecture"]
 series: ["Structure de Code"]
 description: "Le trio UI / Repositories / Services est le découpage .NET le plus répandu dans la nature. Voilà comment le faire bien, et quand il commence à te freiner."
 ---

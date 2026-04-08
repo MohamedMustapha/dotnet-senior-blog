@@ -3,6 +3,7 @@ title: "Vertical Slicing in .NET: Organize by Feature, Not by Layer"
 date: 2026-04-08
 draft: false
 tags: ["architecture", "dotnet", "vertical-slicing"]
+categories: ["Architecture"]
 series: ["Code Structure"]
 description: "Stop splitting your codebase into Controllers, Services, and Repositories folders. Organize by feature instead. Here is Vertical Slice Architecture in .NET, with realistic code and the trade-offs nobody talks about."
 ---

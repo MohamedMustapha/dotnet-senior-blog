@@ -3,6 +3,7 @@ title: "Clean Architecture en .NET : des dépendances qui pointent dans le bon s
 date: 2026-04-08
 draft: false
 tags: ["architecture", "dotnet", "clean-architecture"]
+categories: ["Architecture"]
 series: ["Structure de Code"]
 description: "Clean Architecture, ce n'est pas quatre projets et un diagramme en cercles. C'est une seule règle : les dépendances pointent vers l'intérieur. Voilà comment la mettre en place en .NET, sans dogme."
 ---

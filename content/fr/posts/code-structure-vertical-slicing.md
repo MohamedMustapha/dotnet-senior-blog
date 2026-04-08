@@ -3,6 +3,7 @@ title: "Vertical Slicing en .NET : organise par fonctionnalité, pas par couche"
 date: 2026-04-08
 draft: false
 tags: ["architecture", "dotnet", "vertical-slicing"]
+categories: ["Architecture"]
 series: ["Structure de Code"]
 description: "Arrête de découper ton code en dossiers Controllers, Services et Repositories. Organise par fonctionnalité. Voilà le Vertical Slice Architecture en .NET, avec du code réaliste et les compromis dont personne ne parle."
 ---

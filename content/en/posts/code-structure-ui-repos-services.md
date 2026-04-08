@@ -3,6 +3,7 @@ title: "UI / Repositories / Services: The Pragmatic .NET Layering"
 date: 2026-04-08
 draft: false
 tags: ["architecture", "dotnet", "layered", "clean-code"]
+categories: ["Architecture"]
 series: ["Code Structure"]
 description: "The UI / Repositories / Services trio is the most common .NET layering in the wild. Here is how to build it right, and when it starts to bite."
 ---
