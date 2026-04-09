@@ -175,7 +175,7 @@ series:
         title_fr: "Couche Application : CQS et CQRS"
         slug: "cqs-cqrs"
         tags: ["application-layer", "cqrs", "cqs", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Data Access: Repository Pattern or Not"
         title_fr: "Accès aux Données : Repository Pattern ou pas"
