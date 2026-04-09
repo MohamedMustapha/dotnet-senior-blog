@@ -181,7 +181,7 @@ series:
         title_fr: "Accès aux Données : Repository Pattern ou pas"
         slug: "repository-or-not"
         tags: ["data-access", "repository", "dotnet"]
-        status: "todo"
+        status: "done"
 
   - name: "Deployment"
     slug: "deployment"
