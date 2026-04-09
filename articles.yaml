@@ -148,7 +148,7 @@ series:
         title_fr: "EF Core : les Migrations en pratique"
         slug: "efcore-migrations"
         tags: ["database", "efcore", "migrations", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "EF Core: Read Optimization"
         title_fr: "EF Core : Optimisation des Lectures"
