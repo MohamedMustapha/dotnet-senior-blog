@@ -208,7 +208,7 @@ series:
         title_fr: ".NET Aspire : le cloud-native simplifié"
         slug: "dotnet-aspire"
         tags: ["deployment", "aspire", "dotnet"]
-        status: "todo"
+        status: "done"
 
   - name: "Hosting"
     slug: "hosting"
