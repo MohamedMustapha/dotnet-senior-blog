@@ -166,7 +166,7 @@ series:
         title_fr: "Diagnostic : comment enquêter et résoudre les problèmes de performance de la base de données"
         slug: "database-performance-diagnosis"
         tags: ["database", "performance", "dotnet"]
-        status: "todo"
+        status: "done"
 
   - name: "Layer Focused"
     slug: "layer-focused"
