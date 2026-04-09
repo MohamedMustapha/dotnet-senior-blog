@@ -270,7 +270,7 @@ Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la 
 
 - [Héberger ASP.NET Core avec Docker : un guide pragmatique](/fr/posts/hosting-docker/)
 - [Héberger ASP.NET Core sur Kubernetes : l'essentiel pour les devs .NET](/fr/posts/hosting-kubernetes/)
-- [La Compilation AOT en .NET : démarrage, taille, et les compromis dont personne ne parle](/fr/posts/performance-aot-compilation/)
+- [La Compilation AOT en .NET : démarrage, taille, et compromis](/fr/posts/performance-aot-compilation/)
 - [Le Spike Testing en .NET : survivre au burst soudain](/fr/posts/load-testing-spike/)
 
 ## Références

@@ -5,7 +5,7 @@ draft: false
 tags: ["architecture", "dotnet", "vertical-slicing"]
 categories: ["Architecture"]
 series: ["Structure de Code"]
-description: "Arrête de découper ton code en dossiers Controllers, Services et Repositories. Organise par fonctionnalité. Voilà le Vertical Slice Architecture en .NET, avec du code réaliste et les compromis dont personne ne parle."
+description: "Arrête de découper ton code en dossiers Controllers, Services et Repositories. Organise par fonctionnalité. Voilà le Vertical Slice Architecture en .NET, avec du code réaliste et ses vrais compromis."
 ---
 
 Hello tous le monde, aujourd'hui on va découvrir le **Vertical Slicing**, le pattern qui remet en cause à peu près tout ce que les patterns précédents de cette série t'ont appris.

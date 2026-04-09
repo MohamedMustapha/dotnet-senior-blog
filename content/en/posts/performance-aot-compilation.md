@@ -1,5 +1,5 @@
 ---
-title: "AOT Compilation in .NET: Startup, Size, and the Trade-offs Nobody Mentions"
+title: "AOT Compilation in .NET: Startup, Size, and Trade-offs"
 date: 2026-04-08
 draft: false
 tags: ["performance", "aot", "dotnet"]

@@ -268,7 +268,7 @@ Ready to level up your next project or share it with your team? See you in the n
 
 - [Hosting ASP.NET Core with Docker: A Pragmatic Guide](/posts/hosting-docker/)
 - [Hosting ASP.NET Core on Kubernetes: The Essentials for .NET Developers](/posts/hosting-kubernetes/)
-- [AOT Compilation in .NET: Startup, Size, and the Trade-offs Nobody Mentions](/posts/performance-aot-compilation/)
+- [AOT Compilation in .NET: Startup, Size, and Trade-offs](/posts/performance-aot-compilation/)
 - [Spike Testing in .NET: Surviving the Sudden Burst](/posts/load-testing-spike/)
 
 ## References

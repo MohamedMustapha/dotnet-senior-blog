@@ -227,7 +227,7 @@ Ready to level up your next project or share it with your team? See you in the n
 
 - [Hosting ASP.NET Core on IIS: The Classic, Demystified](/posts/hosting-iis/)
 - [Integration Testing with TestContainers for .NET](/posts/testing-integration-testing-testcontainers/)
-- [AOT Compilation in .NET: Startup, Size, and the Trade-offs Nobody Mentions](/posts/performance-aot-compilation/)
+- [AOT Compilation in .NET: Startup, Size, and Trade-offs](/posts/performance-aot-compilation/)
 
 ## References
 

@@ -229,7 +229,7 @@ Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la 
 
 - [Héberger ASP.NET Core sur IIS : le classique, démystifié](/fr/posts/hosting-iis/)
 - [Tests d'Intégration avec TestContainers pour .NET](/fr/posts/testing-integration-testing-testcontainers/)
-- [La Compilation AOT en .NET : démarrage, taille, et les compromis dont personne ne parle](/fr/posts/performance-aot-compilation/)
+- [La Compilation AOT en .NET : démarrage, taille, et compromis](/fr/posts/performance-aot-compilation/)
 
 ## Références
 

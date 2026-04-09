@@ -1,5 +1,5 @@
 ---
-title: "La Compilation AOT en .NET : démarrage, taille, et les compromis dont personne ne parle"
+title: "La Compilation AOT en .NET : démarrage, taille, et compromis"
 date: 2026-04-08
 draft: false
 tags: ["performance", "aot", "dotnet"]

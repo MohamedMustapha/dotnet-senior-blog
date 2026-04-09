@@ -5,7 +5,7 @@ draft: false
 tags: ["architecture", "dotnet", "vertical-slicing"]
 categories: ["Architecture"]
 series: ["Code Structure"]
-description: "Stop splitting your codebase into Controllers, Services, and Repositories folders. Organize by feature instead. Here is Vertical Slice Architecture in .NET, with realistic code and the trade-offs nobody talks about."
+description: "Stop splitting your codebase into Controllers, Services, and Repositories folders. Organize by feature instead. Here is Vertical Slice Architecture in .NET, with realistic code and its actual trade-offs."
 ---
 
 Every layered pattern we have looked at in this series, [N-Layered](/en/posts/code-structure-n-layered/), [UI / Repositories / Services](/en/posts/code-structure-ui-repos-services/), and [Clean Architecture](/en/posts/code-structure-clean-architecture/), shares the same core assumption: the right way to split code is by *technical role*. Controllers over here, services over there, repositories in the back, entities in the middle. It is so ingrained in the .NET community that most developers never question it.

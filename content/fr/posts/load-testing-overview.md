@@ -5,7 +5,7 @@ draft: false
 tags: ["load-testing", "performance", "dotnet"]
 categories: ["Testing"]
 series: ["Tests de Charge"]
-description: "Baseline, soak, stress, spike : quatre types de tests de charge, quatre questions sur la tenue en production. Un tour pragmatique pour les équipes .NET, avec les outils et les métriques qui comptent vraiment."
+description: "Baseline, soak, stress, spike : quatre types de tests de charge, quatre questions sur la tenue en production. Un tour pragmatique pour les équipes .NET, avec les outils et les métriques à suivre."
 ---
 
 Hello tous le monde, aujourd'hui on va démystifier les **tests de charge** en .NET, et plus particulièrement les quatre types qui structurent une vraie stratégie de performance.
