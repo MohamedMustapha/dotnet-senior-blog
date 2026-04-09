@@ -98,7 +98,7 @@ Remarque ce qui n'est **pas** là : pas d'attribut `[Table]`, pas de `DbContext`
 
 ## Zoom : Application, les cas d'usage
 
-La couche Application décrit ce que le système *fait*, exprimé sous forme de cas d'usage. C'est ici que vivent les commandes et les queries, que les transactions sont coordonnées, et que tu déclares les *ports* (interfaces) que l'Infrastructure viendra brancher. Si le découpage commandes / queries est nouveau pour toi, l'article dédié [CQRS expliqué pour les développeurs .NET](/fr/posts/cqrs-explique/) traite le pattern en profondeur, cette section se contente d'en supposer la forme.
+La couche Application décrit ce que le système *fait*, exprimé sous forme de cas d'usage. C'est ici que vivent les commandes et les queries, que les transactions sont coordonnées, et que tu déclares les *ports* (interfaces) que l'Infrastructure viendra brancher. Si le découpage commandes / queries est nouveau pour toi, l'article dédié [Couche Application en .NET : CQS et CQRS sans le hype](/fr/posts/layer-focused-cqs-cqrs/) traite le pattern en profondeur, cette section se contente d'en supposer la forme.
 
 ```csharp
 // Application/Orders/SubmitOrder/SubmitOrderCommand.cs
