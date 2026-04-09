@@ -169,7 +169,7 @@ series:
         title_fr: "Endpoints : Controllers vs Minimal API"
         slug: "controllers-vs-minimal-api"
         tags: ["endpoints", "controllers", "minimal-api", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Application Layer: CQS and CQRS"
         title_fr: "Couche Application : CQS et CQRS"
