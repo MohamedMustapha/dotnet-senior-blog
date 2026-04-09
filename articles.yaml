@@ -160,7 +160,7 @@ series:
         title_fr: "Dapper : quand et comment l'utiliser"
         slug: "dapper"
         tags: ["database", "dapper", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Diagnosis: How to investigate and Fix Database Performance Issues"
         title_fr: "Diagnostic : comment enquêter et résoudre les problèmes de performance de la base de données"
