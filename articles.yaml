@@ -190,7 +190,7 @@ series:
         title_fr: "Docker pour .NET : Dockerfile et Compose"
         slug: "docker-dockerfile-compose"
         tags: ["deployment", "docker", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Docker Security Best Practices for .NET"
         title_fr: "Docker : bonnes pratiques de sécurité pour .NET"
