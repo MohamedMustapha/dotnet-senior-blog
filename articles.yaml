@@ -196,7 +196,7 @@ series:
         title_fr: "Docker : bonnes pratiques de sécurité pour .NET"
         slug: "docker-security"
         tags: ["deployment", "docker", "security", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Kubernetes Primer for .NET Developers"
         title_fr: "Kubernetes : l'essentiel pour les devs .NET"
