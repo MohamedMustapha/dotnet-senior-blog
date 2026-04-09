@@ -154,7 +154,7 @@ series:
         title_fr: "EF Core : Optimisation des Lectures"
         slug: "efcore-read-optimization"
         tags: ["database", "efcore", "performance", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Dapper: When and How"
         title_fr: "Dapper : quand et comment l'utiliser"
