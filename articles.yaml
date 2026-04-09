@@ -202,7 +202,7 @@ series:
         title_fr: "Kubernetes : l'essentiel pour les devs .NET"
         slug: "kubernetes-primer"
         tags: ["deployment", "kubernetes", "dotnet"]
-        status: "todo"
+        status: "done"
 
       - title_en: ".NET Aspire: Cloud-Native Made Simple"
         title_fr: ".NET Aspire : le cloud-native simplifié"
