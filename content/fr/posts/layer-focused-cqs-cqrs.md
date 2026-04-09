@@ -186,7 +186,7 @@ public sealed class GetOrderListHandler
 
 Même `DbContext`. Une seule base. Deux formes de code très différentes. La commande passe par les agrégats pour protéger les invariants. La query contourne les agrégats pour livrer des pixels. C'est CQRS à son maximum d'utilité : une séparation architecturale propre *sans* deux bases, *sans* event sourcing, *sans* casse-tête de cohérence éventuelle.
 
-> 💡 **Info** : Une seule base, deux chemins de code. On appelle parfois ça "soft CQRS" ou "CQRS lite", et pour la plupart des applications métier, c'est la version qui mérite sa place. Pour l'histoire complète de l'évolution de CQRS et de quand les variantes plus lourdes ont du sens, voir [CQRS expliqué pour les développeurs .NET](/fr/posts/cqrs-explique/).
+> 💡 **Info** : Une seule base, deux chemins de code. On appelle parfois ça "soft CQRS" ou "CQRS lite", et pour la plupart des applications métier, c'est la version qui mérite sa place. Les variantes plus lourdes (store de lecture séparé, event sourcing) sont traitées dans la dernière section de cet article.
 
 ## Zoom : où s'insère la couche endpoint
 
@@ -259,7 +259,6 @@ Prêt à booster ton prochain projet ou à le partager avec ton équipe ? À la 
 ## Pour aller plus loin
 
 - [Endpoints en .NET : Controllers vs Minimal API, la comparaison honnête](/fr/posts/layer-focused-controllers-vs-minimal-api/)
-- [CQRS expliqué pour les développeurs .NET](/fr/posts/cqrs-explique/)
 - [Vertical Slicing en .NET : organise par fonctionnalité, pas par couche](/fr/posts/code-structure-vertical-slicing/)
 
 ## Références

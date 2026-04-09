@@ -184,7 +184,7 @@ public sealed class GetOrderListHandler
 
 Same `DbContext`. One database. Two very different shapes of code. The command goes through aggregates to protect invariants. The query goes around aggregates to deliver pixels. This is CQRS at its most useful: a clean architectural split *without* two databases, *without* event sourcing, *without* eventual consistency headaches.
 
-> 💡 **Info** — Single database, split code paths. This is sometimes called "soft CQRS" or "CQRS lite", and for most business applications it is the version that earns its keep. For the full story on how CQRS evolved and when the heavier variants make sense, see [CQRS Explained for .NET Developers](/en/posts/cqrs-explained/).
+> 💡 **Info** — Single database, split code paths. This is sometimes called "soft CQRS" or "CQRS lite", and for most business applications it is the version that earns its keep. The heavier variants (separate read store, event sourcing) are covered in the last section of this article.
 
 ## Zoom: where the endpoint layer fits
 
@@ -257,7 +257,6 @@ Ready to level up your next project or share it with your team? See you in the n
 ## Related articles
 
 - [Endpoints in .NET: Controllers vs Minimal API, the Honest Comparison](/en/posts/layer-focused-controllers-vs-minimal-api/)
-- [CQRS Explained for .NET Developers](/en/posts/cqrs-explained/)
 - [Vertical Slicing in .NET: Organize by Feature, Not by Layer](/en/posts/code-structure-vertical-slicing/)
 
 ## References

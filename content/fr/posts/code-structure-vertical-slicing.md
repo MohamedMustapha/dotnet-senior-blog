@@ -218,7 +218,7 @@ public sealed class GetOrderDetailsHandler
 
 Une seule requête SQL. Une seule projection. Zéro repository. Le côté lecture ne prétend pas respecter le modèle de domaine, parce qu'il n'en a pas besoin : il n'y a pas d'invariant à faire respecter quand tu affiches juste des données.
 
-> 💡 **Info** : C'est l'idée du **CQRS** appliquée au niveau de la slice. Les commandes passent par le domaine (pour faire respecter les invariants). Les queries le court-circuitent (pour la vitesse et la simplicité). Pas besoin de bases de données séparées ou d'event sourcing pour en profiter. Pour le tableau complet de ce qu'est CQRS, d'où ça vient, et comment l'appliquer sans sur-ingénierie, vois l'article dédié : [CQRS expliqué pour les développeurs .NET](/fr/posts/cqrs-explique/).
+> 💡 **Info** : C'est l'idée du **CQRS** appliquée au niveau de la slice. Les commandes passent par le domaine (pour faire respecter les invariants). Les queries le court-circuitent (pour la vitesse et la simplicité). Pas besoin de bases de données séparées ou d'event sourcing pour en profiter. Pour le tableau complet de ce qu'est CQRS, d'où ça vient, et comment l'appliquer sans sur-ingénierie, vois l'article dédié : [Couche Application en .NET : CQS et CQRS sans le hype](/fr/posts/layer-focused-cqs-cqrs/).
 
 > ⚠️ **Ça marche, mais...** : Résiste à la tentation d'introduire une interface `IReadRepository` pour les queries. Ça ajoute une couche d'indirection qu'aucune autre fonctionnalité ne réutilisera jamais. Si tu veux le mocker pour les tests, mocke le `DbContext` ou utilise un provider in-memory.
 

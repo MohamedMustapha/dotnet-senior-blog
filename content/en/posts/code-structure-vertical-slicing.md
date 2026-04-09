@@ -216,7 +216,7 @@ public sealed class GetOrderDetailsHandler
 
 One SQL query. One projection. Zero repositories. The read side does not pretend to respect the domain model, because it does not need to: there are no invariants to enforce when you are just displaying data.
 
-> 💡 **Info** : This is the **CQRS** idea applied at slice level. Commands go through the domain (to enforce invariants). Queries bypass it (for speed and simplicity). You do not need separate databases or event sourcing to get the benefit. For the full picture of what CQRS is, where it comes from, and how to apply it without over-engineering, see the dedicated article: [CQRS Explained for .NET Developers](/posts/cqrs-explained/).
+> 💡 **Info** : This is the **CQRS** idea applied at slice level. Commands go through the domain (to enforce invariants). Queries bypass it (for speed and simplicity). You do not need separate databases or event sourcing to get the benefit. For the full picture, see [Application Layer in .NET: CQS and CQRS Without the Hype](/en/posts/layer-focused-cqs-cqrs/).
 
 > ⚠️ **It works, but...** : Resist the urge to introduce a `ReadRepository` interface for queries. It adds a layer of indirection that no other feature will ever reuse. If you want to mock it for tests, mock the `DbContext` or use an in-memory provider.
 
