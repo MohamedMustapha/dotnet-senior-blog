@@ -121,7 +121,7 @@ series:
         title_fr: "Gestion Globale des Erreurs en ASP.NET Core"
         slug: "global-error-handling"
         tags: ["error-handling", "dotnet", "middleware"]
-        status: "todo"
+        status: "done"
 
       - title_en: "The Result Pattern"
         title_fr: "Le Result Pattern"
