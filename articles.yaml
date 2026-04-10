@@ -133,7 +133,7 @@ series:
         title_fr: "Quand lever une exception, quand logger"
         slug: "throw-or-log"
         tags: ["error-handling", "dotnet", "logging"]
-        status: "todo"
+        status: "done"
 
   - name: "Database"
     slug: "database"
