@@ -2,7 +2,7 @@
 # Refer to the theme docs for more details about each of these parameters.
 # https://jpanther.github.io/congo/docs/getting-started/
 
-baseURL = "https://dotnet-senior-blog.pages.dev/"
+baseURL = "https://senior-dotnet-path.pages.dev/"
 theme = "congo"
 defaultContentLanguage = "en"
 
@@ -33,10 +33,10 @@ summaryLength = 0
   [languages.en]
     languageName = "English"
     weight = 1
-    title = ".NET Senior Path"
+    title = "Road to Senior .NET Developer"
     contentDir = "content/en"
   [languages.fr]
     languageName = "Français"
     weight = 2
-    title = ".NET Senior Path"
+    title = "Road to Senior .NET Developer"
     contentDir = "content/fr"
