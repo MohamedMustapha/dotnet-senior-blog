@@ -127,7 +127,7 @@ series:
         title_fr: "Le Result Pattern"
         slug: "result-pattern"
         tags: ["error-handling", "dotnet", "result-pattern"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Where to Throw, Where to Log"
         title_fr: "Quand lever une exception, quand logger"
