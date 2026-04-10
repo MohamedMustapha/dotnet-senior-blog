@@ -115,7 +115,7 @@ series:
         title_fr: "Exceptions Personnalisées en .NET"
         slug: "custom-exceptions"
         tags: ["error-handling", "dotnet", "exceptions"]
-        status: "todo"
+        status: "done"
 
       - title_en: "Global Error Handling in ASP.NET Core"
         title_fr: "Gestion Globale des Erreurs en ASP.NET Core"
