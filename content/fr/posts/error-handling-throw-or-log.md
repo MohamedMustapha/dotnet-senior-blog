@@ -92,6 +92,134 @@ Si on n'utilise pas le Result pattern, le handler ne catche rien du tout. L'exce
 
 > ❌ **Ne jamais faire** — Ne pas écrire `catch (Exception ex) { _logger.LogError(ex, "..."); throw; }` dans un handler. Ça produit une entrée de log au niveau du handler et une autre au niveau du gestionnaire global pour la même exception. Le gestionnaire global est le point unique de logging pour les exceptions non gérées.
 
+## Appliqué : le flux d'erreur en Clean Architecture
+
+La [Clean Architecture](/fr/posts/code-structure-clean-architecture/) comporte quatre couches concentriques : Domain (centre), Application, Infrastructure et Présentation (extérieur). Le flux d'erreur s'y projette directement :
+
+{{< mermaid >}}
+graph TD
+    A[Domaine — Entités, Value Objects] -->|lance DomainException| B[Application — Use Cases / Handlers]
+    B -->|retourne Result ou laisse l'exception se propager| C[Infrastructure — Repos, Adaptateurs]
+    C -->|enveloppe les exceptions d'infrastructure| B
+    B -->|Result ou exception| D[Présentation — Controllers, Endpoints]
+    D -->|mappe vers HTTP| E[Gestionnaire global d'erreurs]
+    E -->|logge + ProblemDetails| F[Client]
+
+    style A fill:#f9f,stroke:#333
+    style E fill:#ff9,stroke:#333
+{{< /mermaid >}}
+
+**Domaine (Entités, Value Objects, Domain Services) :** lance des `DomainException` ou des exceptions framework. Pas d'`ILogger`, pas de try-catch, pas de Result. Le projet domaine n'a aucune dépendance NuGet vers le logging ou HTTP.
+
+```csharp
+// Domain/Orders/Order.cs
+public void AddLine(Product product, int quantity)
+{
+    if (quantity <= 0)
+        throw new ArgumentOutOfRangeException(nameof(quantity));
+
+    if (Status != OrderStatus.Draft)
+        throw new OrderNotEditableException(Id, Status);
+
+    _lines.Add(new OrderLine(product.Id, product.Name, product.Price, quantity));
+    RecalculateTotal();
+}
+```
+
+**Application (Use Cases / Handlers) :** orchestre les appels au domaine et à l'infrastructure. Retourne `Result<T>` ou laisse les exceptions se propager. Ne catche que pour traduire les exceptions domaine en échecs Result. Ne logge jamais.
+
+```csharp
+// Application/Orders/Commands/AddLineHandler.cs
+public async Task<Result<Unit>> Handle(AddLineCommand cmd, CancellationToken ct)
+{
+    var order = await _orderRepository.GetByIdAsync(cmd.OrderId, ct)
+        ?? return Error.NotFound($"Order {cmd.OrderId} not found.");
+
+    var product = await _productRepository.GetByIdAsync(cmd.ProductId, ct)
+        ?? return Error.NotFound($"Product {cmd.ProductId} not found.");
+
+    try
+    {
+        order.AddLine(product, cmd.Quantity);
+    }
+    catch (OrderNotEditableException)
+    {
+        return Error.Conflict($"Order {cmd.OrderId} is no longer editable.");
+    }
+
+    await _unitOfWork.SaveChangesAsync(ct);
+    return Unit.Value;
+}
+```
+
+**Infrastructure (Repositories, Services externes) :** catche les exceptions d'infrastructure et les enveloppe dans des exceptions personnalisées. L'implémentation d'`IOrderRepository` catche `DbException` et l'enveloppe ; l'adaptateur de paiement catche `HttpRequestException` et l'enveloppe. Ne logge jamais.
+
+**Présentation (Controllers, Minimal API endpoints) :** mappe le Result vers HTTP. Ne lance pas, ne catche pas, ne logge pas. Le gestionnaire global d'erreurs (enregistré comme middleware) est le seul catch-all.
+
+> 💡 **Info** — En Clean Architecture, la règle de dépendance impose que les couches internes ne référencent pas les couches externes. Le domaine ne peut donc pas accéder à `ILogger` ni à `HttpContext`, ce qui renforce la règle "throw, don't log" par conception.
+
+## Appliqué : le flux d'erreur en UI / Repos / Services
+
+Le pattern à trois couches ([UI / Repos / Services](/fr/posts/code-structure-ui-repos-services/)) est plus plat, mais les mêmes règles s'appliquent. La différence principale : la logique métier vit dans les classes Service plutôt que dans des méthodes d'entités isolées.
+
+{{< mermaid >}}
+graph TD
+    A[Repository] -->|lance ou enveloppe les exceptions data| B[Service]
+    B -->|lance les exceptions métier| C[Controller]
+    C -->|délègue au gestionnaire global| D[Gestionnaire global d'erreurs]
+    D -->|logge + ProblemDetails| E[Client]
+
+    style A fill:#f9f,stroke:#333
+    style D fill:#ff9,stroke:#333
+{{< /mermaid >}}
+
+**Couche Repository :** accès aux données uniquement. Lance des `DbException` ou les enveloppe dans une exception d'accès aux données personnalisée. Ne contient jamais de logique métier, ne logge jamais.
+
+```csharp
+// Repositories/OrderRepository.cs
+public async Task<Order> GetByIdAsync(Guid id, CancellationToken ct)
+{
+    return await _db.Orders.FindAsync([id], ct)
+        ?? throw new EntityNotFoundException(nameof(Order), id);
+}
+```
+
+**Couche Service :** contient les règles métier. C'est là que la plupart des throw se produisent :
+
+```csharp
+// Services/OrderService.cs
+public async Task AddLineAsync(Guid orderId, Guid productId, int quantity, CancellationToken ct)
+{
+    var order = await _orderRepo.GetByIdAsync(orderId, ct);
+
+    if (order.Status != OrderStatus.Draft)
+        throw new OrderNotEditableException(orderId, order.Status);
+
+    var product = await _productRepo.GetByIdAsync(productId, ct);
+    order.Lines.Add(new OrderLine(product.Id, product.Name, product.Price, quantity));
+
+    await _orderRepo.SaveAsync(order, ct);
+}
+```
+
+Le service ne catche pas, ne logge pas. Il appelle le repository, applique la règle métier et laisse les exceptions se propager.
+
+**Couche UI (Controller) :** adaptateur fin. Mappe les exceptions ou les Results en réponses HTTP. Ne contient pas de logique métier :
+
+```csharp
+// Controllers/OrdersController.cs
+[HttpPost("{id:guid}/lines")]
+public async Task<IActionResult> AddLine(Guid id, AddLineRequest request, CancellationToken ct)
+{
+    await _orderService.AddLineAsync(id, request.ProductId, request.Quantity, ct);
+    return NoContent();
+}
+```
+
+Pas de try-catch ici. Le gestionnaire global catche `EntityNotFoundException` → 404, `OrderNotEditableException` → 409, tout le reste → 500.
+
+> ✅ **Bonne pratique** — Dans le pattern UI/Repos/Services, il faut résister à la tentation d'ajouter un try-catch dans le controller "au cas où". Le gestionnaire global existe précisément pour ça. Un controller avec cinq blocs try-catch fait mal le travail du gestionnaire global.
+
 ## Règle 3 : les adaptateurs d'infrastructure enveloppent et relancent
 
 Quand on appelle un service externe, l'adaptateur catche l'exception d'infrastructure et l'enveloppe dans une [exception personnalisée](/fr/posts/error-handling-custom-exceptions/) qui a du sens pour la couche application :
@@ -217,6 +345,8 @@ Prêt à auditer les try-catch de ton code et à supprimer ceux qui ne décident
 - [Gestion Globale des Erreurs en ASP.NET Core](/fr/posts/error-handling-global-error-handling/)
 - [Le Result Pattern](/fr/posts/error-handling-result-pattern/)
 - [Couche Application : CQS et CQRS](/fr/posts/layer-focused-cqs-cqrs/)
+- [Clean Architecture](/fr/posts/code-structure-clean-architecture/)
+- [UI / Repos / Services](/fr/posts/code-structure-ui-repos-services/)
 
 ## Références
 

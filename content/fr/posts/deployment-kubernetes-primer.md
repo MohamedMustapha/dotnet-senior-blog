@@ -72,6 +72,251 @@ Deux habitudes économisent du vrai temps. D'abord, fixer un namespace par défa
 
 > 💡 **Info** : `kubectl logs -l app=shop-api --follow` est la commande à retenir pour du log tailing en prod. Elle agrège les logs de chaque pod qui matche en temps réel, ce qui est exactement ce qu'il faut pour debugger pourquoi un endpoint précis est lent sur plusieurs réplicas.
 
+## Zoom : le manifest naïf en un seul fichier
+
+Chaque tutoriel "démarrer avec Kubernetes" commence de la même façon : un seul fichier YAML, tout inliné.
+
+```yaml
+# k8s/all-in-one.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-api
+  template:
+    metadata:
+      labels:
+        app: shop-api
+    spec:
+      containers:
+        - name: api
+          image: myregistry.azurecr.io/shop-api:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ConnectionStrings__Default
+              value: "Host=postgres;Database=shop;Username=admin;Password=supersecret"
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shop-api
+spec:
+  selector:
+    app: shop-api
+  ports:
+    - port: 80
+      targetPort: 8080
+```
+
+Cela fonctionne pour une démo de cinq minutes. Dans un contexte réel, plusieurs problèmes apparaissent en même temps :
+
+- **Tag `latest`.** Impossible de savoir quelle version tourne, impossible de faire un rollback vers un build connu, et le comportement de pull d'image dépend du cache du noeud.
+- **Secrets en clair dans le manifest.** La chaîne de connexion est visible par toute personne qui peut lire le fichier, et elle finira dans le contrôle de version.
+- **Aucune limite de ressources.** Une fuite mémoire dans le container peut faire tomber le noeud entier.
+- **Aucune probe.** Kubernetes n'a aucun moyen de savoir si l'application est en bonne santé, et continue de router du trafic vers un pod cassé.
+- **Pas d'ingress.** Le service n'est accessible qu'à l'intérieur du cluster.
+- **Tout dans un seul fichier.** Comparer les différences entre environnements est pénible, et modifier une seule valeur implique d'éditer un fichier qui contient aussi des ressources sans rapport.
+
+Dès qu'un environnement de staging apparaît à côté de la production, cette approche s'effondre. Les sections suivantes montrent comment décomposer proprement.
+
+## Zoom : décomposer en manifests production-grade
+
+Un layout production-grade sépare chaque ressource dans son propre fichier :
+
+```
+k8s/
+├── deployment.yaml
+├── service.yaml
+├── ingress.yaml
+├── configmap.yaml
+├── secret.yaml          # ou mieux : utiliser external-secrets
+└── hpa.yaml
+```
+
+**deployment.yaml** avec probes, limites de ressources et tag d'image fixé :
+
+```yaml
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shop-api
+  template:
+    metadata:
+      labels:
+        app: shop-api
+    spec:
+      containers:
+        - name: api
+          image: myregistry.azurecr.io/shop-api:1.4.7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: shop-api-config
+            - secretRef:
+                name: shop-api-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+```
+
+**configmap.yaml** pour la configuration non sensible :
+
+```yaml
+# k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shop-api-config
+data:
+  ASPNETCORE_ENVIRONMENT: Production
+  Logging__LogLevel__Default: Warning
+  Logging__LogLevel__Microsoft.AspNetCore: Warning
+```
+
+**secret.yaml** pour les valeurs sensibles :
+
+```yaml
+# k8s/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shop-api-secrets
+type: Opaque
+stringData:
+  ConnectionStrings__Default: "Host=postgres;Database=shop;Username=admin;Password=supersecret"
+```
+
+`stringData` accepte du texte brut et Kubernetes l'encode en base64 au repos. Il s'agit d'encodage, pas de chiffrement : toute personne ayant un accès en lecture au namespace peut le décoder. Pour tout ce qui dépasse un cluster de dev local, l'étape suivante est [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) ou l'[External Secrets Operator](https://external-secrets.io/) pointant vers un vrai coffre-fort.
+
+> ❌ **Ne jamais faire** : Ne jamais commiter un manifest Secret en clair dans git. Utiliser `kubectl create secret` de façon impérative, ou utiliser Sealed Secrets / External Secrets Operator pour garder les secrets complètement hors du contrôle de version.
+
+**hpa.yaml** pour l'autoscaling horizontal :
+
+```yaml
+# k8s/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: shop-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: shop-api
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
+
+Chaque fichier a une responsabilité unique, chacun peut être diffé indépendamment, et chacun peut être surchargé par environnement avec des patches Kustomize (couvert dans la section suivante).
+
+## Zoom : de Compose à Kubernetes avec kompose
+
+Les équipes qui viennent de [Docker Compose](/fr/posts/deployment-docker-dockerfile-compose/) peuvent utiliser `kompose` comme chemin de migration. L'outil lit un `compose.yaml` et génère des manifests Kubernetes :
+
+```bash
+kompose convert -f compose.yaml -o k8s/
+```
+
+Pour un fichier Compose typique avec un service API et une base de données, `kompose` génère un Deployment et un Service pour chaque container, et des PersistentVolumeClaims pour les volumes nommés. La structure de base est correcte et le temps de scaffolding initial est réduit.
+
+Ce que `kompose` ne génère pas, et qu'il faut ajouter manuellement :
+
+- **Probes de liveness et readiness.** Compose a `healthcheck`, mais `kompose` ne le mappe pas toujours correctement vers les probes Kubernetes.
+- **Requests et limits de ressources.** Le `deploy.resources` de Compose n'est que partiellement supporté.
+- **Ingress.** Compose n'a pas de concept équivalent, il n'y a donc rien à convertir.
+- **Secrets.** Les `secrets` et variables d'environnement de Compose sont convertis en ConfigMaps, pas en Secrets Kubernetes.
+- **Claims de volumes.** Les PVCs générés utilisent des storage classes et des modes d'accès par défaut qui ne correspondent pas forcément au cluster cible.
+
+La checklist de nettoyage post-kompose :
+
+1. Ajouter des probes de readiness et liveness à chaque Deployment.
+2. Fixer les requests et limits de ressources.
+3. Remplacer les entrées de ConfigMap contenant des secrets par des ressources Secret (ou external-secrets).
+4. Vérifier les tailles de PVC et les storage classes générées.
+5. Ajouter une ressource Ingress.
+6. Fixer les tags d'image (`kompose` conserve le tag du fichier Compose, qui est souvent `latest`).
+
+> ⚠️ **Ça marche, mais...** : `kompose` est un point de départ, pas une sortie production. Les fichiers générés sont du scaffolding, et chacun d'entre eux nécessite une relecture avant d'être appliqué sur un vrai cluster.
+
+## Zoom : passer les secrets depuis la CI/CD
+
+Les secrets doivent vivre dans le store de secrets de la plateforme CI/CD et être injectés au moment du déploiement, jamais committés dans git. Voici deux pipelines concrets.
+
+**GitHub Actions :**
+
+```yaml
+- name: Deploy to AKS
+  run: |
+    kubectl create secret generic shop-secrets \
+      --from-literal=ConnectionStrings__Default="${{ secrets.DB_CONNECTION }}" \
+      --from-literal=PaymentGateway__ApiKey="${{ secrets.PAYMENT_KEY }}" \
+      --namespace shop-prod \
+      --dry-run=client -o yaml | kubectl apply -f -
+    
+    kubectl set image deployment/shop-api \
+      api=myregistry.azurecr.io/shop-api:${{ github.sha }} \
+      --namespace shop-prod
+```
+
+**Azure DevOps :**
+
+```yaml
+- task: Kubernetes@1
+  inputs:
+    connectionType: 'Azure Resource Manager'
+    azureSubscriptionEndpoint: '$(azureSubscription)'
+    azureResourceGroup: '$(resourceGroup)'
+    kubernetesCluster: '$(aksCluster)'
+    command: 'apply'
+    arguments: '-k k8s/overlays/prod'
+    secretType: 'generic'
+    secretArguments: '--from-literal=ConnectionStrings__Default=$(DB_CONNECTION)'
+```
+
+Le pattern `--dry-run=client -o yaml | kubectl apply -f -` dans l'exemple GitHub Actions mérite une explication : `kubectl create secret` échoue normalement si le secret existe déjà. En le rendant en YAML avec `--dry-run=client` et en le pipant vers `kubectl apply`, la commande devient idempotente, elle crée le secret au premier lancement et le met à jour aux lancements suivants sans erreur.
+
+Pour la gestion de secrets production-grade à grande échelle, l'[External Secrets Operator](https://external-secrets.io/) pointant vers Azure Key Vault, ou la fédération OIDC de GitHub pour une authentification sans clé vers les fournisseurs cloud, sont les approches recommandées. Elles suppriment entièrement le besoin de credentials à longue durée de vie dans les variables CI/CD.
+
+> ✅ **Bonne pratique** : Les secrets vivent dans les variables CI/CD (GitHub Secrets, Azure DevOps Variable Groups), jamais dans git, jamais dans les fichiers de values Helm. Le pipeline CI/CD est le seul endroit où les valeurs de secrets sont résolues, et elles sont injectées dans le cluster au moment du déploiement.
+
 ## Zoom : layout des manifests avec Kustomize
 
 Une approche naïve met tous les manifests dans un dossier et les édite à la main pour chaque environnement. Cela marche une semaine et s'effondre après. Kustomize résout le problème avec un pattern **base + overlays** natif à `kubectl` depuis la 1.14.

@@ -118,6 +118,205 @@ Le registry stocke ensuite un **manifest list** : un seul tag (`1.4.7`) qui poin
 
 > ✅ **Bonne pratique** : Tagger les images avec à la fois une version et un alias `cache` dans le même registry. Le tag de version (`1.4.7`) est immuable et avance à chaque release ; le tag `cache` n'est utilisé que par le builder. Cela garde le cache de build séparé des artefacts de release et simplifie le garbage collection.
 
+## Zoom : où placer le Dockerfile dans une solution .NET
+
+Une question qui revient tôt dans tout projet .NET utilisant Docker : où vit le `Dockerfile`, et qu'est-ce qui constitue le build context ? Deux approches couvrent la grande majorité des cas.
+
+### Approche A : Dockerfile à la racine de la solution (recommandé pour la plupart des projets)
+
+```
+Shop.sln
+Dockerfile
+docker-compose.yaml
+.dockerignore
+src/
+├── Shop.Api/
+├── Shop.Domain/
+├── Shop.Application/
+└── Shop.Infrastructure/
+```
+
+Le build context est la racine de la solution, ce qui permet à chaque instruction `COPY` du Dockerfile de référencer n'importe quel projet naturellement (`COPY ["src/Shop.Domain/Shop.Domain.csproj", "src/Shop.Domain/"]`). C'est la disposition la plus simple pour une solution avec une seule unité déployable et plusieurs bibliothèques de classes. Le fichier `.dockerignore` se place à côté du Dockerfile et exclut tout ce dont le build n'a pas besoin :
+
+```
+**/.git
+**/bin
+**/obj
+**/node_modules
+**/*.md
+**/*.sln.DotSettings
+.env*
+docker-compose*.yaml
+```
+
+Un bon `.dockerignore` fait gagner des secondes sur le build en réduisant le contexte envoyé au daemon Docker, et il empêche de laisser fuiter des fichiers comme `.env` ou l'historique `.git` dans les layers de l'image.
+
+### Approche B : Dockerfile par projet (microservices ou monorepo)
+
+```
+Shop.sln
+docker-compose.yaml
+src/
+├── Shop.Api/
+│   └── Dockerfile
+├── Shop.Worker/
+│   └── Dockerfile
+└── Shop.Admin/
+    └── Dockerfile
+```
+
+Chaque service a son propre Dockerfile, mais le build context reste la racine de la solution. Dans `docker-compose.yaml`, cela donne :
+
+```yaml
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/Shop.Api/Dockerfile
+```
+
+Le `context: .` garantit que les références de projets partagés (`Shop.Domain`, `Shop.Application`) sont accessibles pendant le build, même si le Dockerfile se trouve dans `src/Shop.Api/`. C'est la disposition standard pour les monorepos ou les solutions produisant plusieurs images container.
+
+> ⚠️ **Ça marche, mais...** : Placer le Dockerfile dans le dossier d'un projet ET utiliser ce dossier comme build context (`context: src/Shop.Api/`) casse le `COPY` pour tout projet partagé comme `Shop.Domain.csproj`, car le build context ne peut pas voir les fichiers au-dessus de lui. Il faut toujours définir le context à la racine de la solution et utiliser la directive `dockerfile:` pour pointer vers le Dockerfile du projet.
+
+## Zoom : le compose naïf vs le compose prêt pour la prod
+
+La plupart des équipes commencent avec un fichier Compose qui marche sur un poste de dev et s'arrêtent là. Voici à quoi cela ressemble :
+
+```yaml
+# compose.yaml — la version naïve
+services:
+  api:
+    build: .
+    ports:
+      - "5000:8080"
+    environment:
+      ConnectionStrings__Default: "Host=postgres;Database=shop;Username=admin;Password=supersecret"
+      ASPNETCORE_ENVIRONMENT: Development
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: supersecret
+```
+
+Cela fait tourner l'application, et il n'y a rien de mal à commencer ainsi. Les problèmes apparaissent quand ce même fichier est utilisé pour la staging ou la prod : les secrets sont codés en dur dans le contrôle de version, il n'y a pas de healthcheck donc `api` peut démarrer avant que Postgres ne soit prêt, pas de limites de ressources donc une fuite mémoire peut faire tomber l'hôte, pas de rotation de logs donc `/var/lib/docker` se remplit en quelques semaines, pas de politique de redémarrage donc un crash à 3h du matin reste down jusqu'à ce que quelqu'un le remarque, et la directive `build:` signifie que chaque déploiement rebuild l'image depuis les sources au lieu de tirer un artefact testé depuis le registry.
+
+Le chemin de ce point de départ vers un Compose prêt pour la prod suit quatre étapes.
+
+### 1. Séparer le build du run
+
+En production, `image:` remplace `build:`. Le pipeline CI build et pousse l'image vers le registry ; le fichier Compose sur la cible de déploiement ne fait que la tirer. Cela garantit que la même image qui a passé les tests en CI est celle qui tourne en production.
+
+```yaml
+services:
+  api:
+    image: myregistry.azurecr.io/shop-api:${VERSION}
+```
+
+### 2. Extraire les secrets dans des fichiers env
+
+Plutôt que de coder en dur les chaînes de connexion et mots de passe, il suffit de référencer des variables et de les fournir au runtime :
+
+```yaml
+services:
+  api:
+    environment:
+      ConnectionStrings__Default: "Host=postgres;Database=shop;Username=${DB_USER};Password=${DB_PASSWORD}"
+```
+
+Les valeurs vivent dans un fichier `.env.production` qui est gitignoré :
+
+```env
+# .env.production — JAMAIS commité
+DB_USER=shop_app
+DB_PASSWORD=r4nd0m-g3n3r4t3d-v4lu3
+VERSION=1.4.7
+```
+
+### 3. Plusieurs fichiers env pour plusieurs environnements
+
+Chaque environnement reçoit son propre fichier env, le même fichier Compose :
+
+```bash
+# Staging
+docker compose --env-file .env.staging up -d
+
+# Production
+docker compose --env-file .env.production up -d
+```
+
+Pas de copier-coller de fichiers Compose par environnement. La topologie reste identique ; seules les valeurs changent.
+
+### 4. Fichiers override pour les différences structurelles
+
+Certaines différences entre le dev et la prod ne sont pas juste des valeurs mais de la structure : le dev a besoin de `build:` et de ports exposés pour le debugging, la prod a besoin de `image:` et de limites de ressources via `deploy:`. Les fichiers override de Compose gèrent cela proprement :
+
+```yaml
+# compose.yaml — base, partagé par tous les environnements
+services:
+  api:
+    image: myregistry.azurecr.io/shop-api:${VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__Default: ${DB_CONNECTION}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+```
+
+```yaml
+# compose.override.yaml — overrides dev, chargé automatiquement
+services:
+  api:
+    build: .
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+```
+
+```yaml
+# compose.prod.yaml — overrides production, chargé explicitement
+services:
+  api:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+```bash
+# Dev : utilise compose.yaml + compose.override.yaml automatiquement
+docker compose up
+
+# Prod : override explicite
+docker compose -f compose.yaml -f compose.prod.yaml --env-file .env.production up -d
+```
+
+> ✅ **Bonne pratique** : `compose.override.yaml` est chargé automatiquement par `docker compose up` quand aucun flag `-f` n'est spécifié, ce qui en fait l'endroit naturel pour les réglages dev-only. Les déploiements en production utilisent toujours des flags `-f` explicites, donc l'override n'est jamais inclus par accident.
+
 ## Zoom : docker bake pour des builds déclaratifs
 
 Lancer la commande `docker buildx build` depuis un Makefile ou un YAML CI marche, mais devient vite moche quand un repository a plusieurs images (API, worker, UI admin) avec une configuration de base partagée. `docker bake` remplace les incantations shell par un fichier HCL :
